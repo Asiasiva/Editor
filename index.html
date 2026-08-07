@@ -205,8 +205,8 @@
         /* AI Layer Switcher Tab Buttons */
         .ai-layer-tab {
             flex: 1;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.7rem;
+            padding: 0.25rem 0.25rem;
+            font-size: 0.65rem;
             font-weight: 700;
             text-align: center;
             border-radius: 0.375rem;
@@ -625,16 +625,19 @@
                 </button>
             </div>
 
-            <!-- Selected Element Info Box & Layer Context Tabs -->
+            <!-- Selected Element Info Box & Layer Context Tabs with AUTO and ALL -->
             <div class="bg-gray-800/80 p-2.5 rounded-lg border border-gray-700 text-xs space-y-2">
                 <div class="text-gray-400 font-semibold uppercase text-[10px] tracking-wider">Selected Element:</div>
                 <div id="ai-selected-element-display" class="font-mono text-amber-400 font-bold truncate bg-gray-900 px-2 py-1 rounded border border-gray-800">
                     None (Inspect & Select)
                 </div>
 
-                <!-- Layer Context Switcher [ HTML ] [ CSS ] [ JS ] -->
+                <!-- Layer Context Switcher [ AUTO ] [ HTML ] [ CSS ] [ JS ] [ ALL ] -->
                 <div class="flex items-center gap-1 pt-1">
-                    <button id="ai-layer-tab-html" onclick="switchAiLayer('html')" class="ai-layer-tab active">
+                    <button id="ai-layer-tab-auto" onclick="switchAiLayer('auto')" class="ai-layer-tab active" title="Chat Based Auto Detect">
+                        <i class="fa-solid fa-robot text-purple-400"></i> Auto
+                    </button>
+                    <button id="ai-layer-tab-html" onclick="switchAiLayer('html')" class="ai-layer-tab">
                         HTML
                     </button>
                     <button id="ai-layer-tab-css" onclick="switchAiLayer('css')" class="ai-layer-tab">
@@ -643,19 +646,22 @@
                     <button id="ai-layer-tab-js" onclick="switchAiLayer('js')" class="ai-layer-tab">
                         JS
                     </button>
+                    <button id="ai-layer-tab-all" onclick="switchAiLayer('all')" class="ai-layer-tab" title="Modify All Layers Simultaneously">
+                        <i class="fa-solid fa-cubes text-emerald-400"></i> ALL
+                    </button>
                 </div>
 
                 <!-- Live Active Layer Preview Box -->
                 <div class="space-y-1 pt-1">
-                    <span id="ai-layer-code-title" class="text-[10px] text-gray-400 block font-semibold uppercase tracking-wider">CURRENT HTML</span>
-                    <pre id="ai-layer-code-display" class="bg-gray-900 p-2 rounded text-[10px] font-mono text-blue-300 max-h-32 overflow-auto whitespace-pre-wrap border border-gray-800">No element selected</pre>
+                    <span id="ai-layer-code-title" class="text-[10px] text-gray-400 block font-semibold uppercase tracking-wider">CURRENT MODE: CHAT AUTO DETECT</span>
+                    <pre id="ai-layer-code-display" class="bg-gray-900 p-2 rounded text-[10px] font-mono text-purple-300 max-h-32 overflow-auto whitespace-pre-wrap border border-gray-800">Auto-Detect Mode: பேசும் உரையாடலில் இருந்தே AI தானாக லேயரைத் தேர்ந்தெடுக்கும்.</pre>
                 </div>
             </div>
 
             <!-- Instruction Input Box -->
             <div class="flex-1 flex flex-col gap-1.5 min-h-[100px]">
                 <label for="ai-instruction-input" class="text-xs font-semibold text-gray-300">What do you want to change?</label>
-                <textarea id="ai-instruction-input" class="w-full flex-1 bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 resize-none" placeholder="எ.கா: button colour blue, make font size 18px..."></textarea>
+                <textarea id="ai-instruction-input" class="w-full flex-1 bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 resize-none" placeholder="எ.கா: பட்டன் கலரை ரெட் ஆக்கு, கிளிக் பண்ணா அலர்ட் காமி..."></textarea>
             </div>
 
             <!-- Fix with AI Button -->
@@ -668,7 +674,7 @@
             <div id="ai-preview-container" class="hidden bg-gray-800 p-2.5 rounded-lg border border-purple-500/50 space-y-2 text-xs">
                 <div class="font-bold text-purple-300 flex items-center justify-between">
                     <span>AI Change Preview</span>
-                    <span class="text-[10px] text-gray-400 font-normal">Review changes</span>
+                    <span id="ai-detected-layer-badge" class="text-[10px] bg-purple-900/80 text-purple-200 px-1.5 py-0.5 rounded font-mono">Layer: AUTO</span>
                 </div>
                 <div class="space-y-1">
                     <span class="text-[10px] text-gray-400 block font-semibold">Original Code:</span>
@@ -834,7 +840,7 @@
         let globalSourceMap = {};
 
         let currentBlobUrl = null;
-        let activeAiLayer = 'html'; // Current Selected Layer in AI Panel: 'html' | 'css' | 'js'
+        let activeAiLayer = 'auto'; // Current Selected Layer in AI Panel: 'auto' | 'html' | 'css' | 'js' | 'all'
 
         let selectedElementState = {
             devId: null,
@@ -1313,13 +1319,34 @@
             }
         };
 
+        // --- SMART CHAT AUTO DETECT ENGINE ---
+        function detectLayerFromChatInstruction(text) {
+            const lower = text.toLowerCase();
+
+            const cssKeywords = ['color', 'colour', 'bg', 'background', 'red', 'blue', 'green', 'yellow', 'white', 'black', 'font', 'size', 'px', 'padding', 'margin', 'border', 'shadow', 'style', 'hover', 'flex', 'align', 'width', 'height', 'radius', 'கலர்', 'நிறம்', 'சைஸ்'];
+            const jsKeywords = ['click', 'alert', 'function', 'event', 'script', 'count', 'logic', 'fetch', 'api', 'hide', 'show', 'toggle', 'அலர்ட்', 'கிளிக்', 'செயல்'];
+            const allKeywords = ['component', 'full', 'all', 'modal', 'card', 'table', 'form', 'login', 'எல்லா', 'முழு', 'மொத்த'];
+
+            let cssScore = 0;
+            let jsScore = 0;
+            let allScore = 0;
+
+            cssKeywords.forEach(k => { if (lower.includes(k)) cssScore++; });
+            jsKeywords.forEach(k => { if (lower.includes(k)) jsScore++; });
+            allKeywords.forEach(k => { if (lower.includes(k)) allScore++; });
+
+            if (allScore > 0 || (cssScore > 0 && jsScore > 0)) return 'all';
+            if (cssScore > jsScore) return 'css';
+            if (jsScore > cssScore) return 'js';
+            return 'html'; // Default Fallback to HTML
+        }
+
         // --- AI LAYER CONTEXT SWITCHER & DISPLAY ENGINE ---
-        
         function getLayerCodeSnippet(layerType) {
-            if (!selectedSourceState) return "No element selected";
+            if (!selectedSourceState && layerType !== 'all') return "No element selected";
 
             if (layerType === 'html') {
-                return selectedSourceState.originalCode || "No HTML Snippet found";
+                return selectedSourceState ? (selectedSourceState.originalCode || "No HTML Snippet found") : codeStore.html;
             } else if (layerType === 'css') {
                 if (selectedElementState.cssMatches && selectedElementState.cssMatches.length > 0) {
                     const cssSrc = currentMode === 'multi' ? codeStore.css : (codeStore.single || htmlCode.value);
@@ -1329,7 +1356,7 @@
                     });
                     return cssText.trim();
                 }
-                return "/* No matching CSS rules found for this element */";
+                return codeStore.css || "/* No matching CSS rules found for this element */";
             } else if (layerType === 'js') {
                 if (selectedElementState.jsMatches && selectedElementState.jsMatches.length > 0) {
                     const jsSrc = currentMode === 'multi' ? codeStore.js : (codeStore.single || htmlCode.value);
@@ -1342,7 +1369,9 @@
                     });
                     return jsText.trim();
                 }
-                return "// No matching JS code found for this element";
+                return codeStore.js || "// No matching JS code found for this element";
+            } else if (layerType === 'all') {
+                return `--- HTML ---\n${codeStore.html}\n\n--- CSS ---\n${codeStore.css}\n\n--- JS ---\n${codeStore.js}`;
             }
             return "";
         }
@@ -1352,7 +1381,7 @@
             const codeEl = document.getElementById('ai-layer-code-display');
             if (!titleEl || !codeEl) return;
 
-            ['html', 'css', 'js'].forEach(l => {
+            ['auto', 'html', 'css', 'js', 'all'].forEach(l => {
                 const btn = document.getElementById(`ai-layer-tab-${l}`);
                 if (btn) {
                     if (l === activeAiLayer) btn.classList.add('active');
@@ -1360,13 +1389,20 @@
                 }
             });
 
-            titleEl.textContent = `CURRENT ${activeAiLayer.toUpperCase()}`;
-            const snippet = getLayerCodeSnippet(activeAiLayer);
-            codeEl.textContent = snippet;
+            if (activeAiLayer === 'auto') {
+                titleEl.textContent = "CURRENT MODE: CHAT AUTO DETECT";
+                codeEl.textContent = "Auto-Detect Mode: பேசும் உரையாடலில் இருந்தே AI தானாக லேயரைத் தேர்ந்தெடுக்கும்.";
+                codeEl.className = "bg-gray-900 p-2 rounded text-[10px] font-mono text-purple-300 max-h-32 overflow-auto whitespace-pre-wrap border border-gray-800";
+            } else {
+                titleEl.textContent = `CURRENT ${activeAiLayer.toUpperCase()}`;
+                const snippet = getLayerCodeSnippet(activeAiLayer);
+                codeEl.textContent = snippet;
 
-            if (activeAiLayer === 'html') codeEl.className = "bg-gray-900 p-2 rounded text-[10px] font-mono text-orange-300 max-h-32 overflow-auto whitespace-pre-wrap border border-gray-800";
-            else if (activeAiLayer === 'css') codeEl.className = "bg-gray-900 p-2 rounded text-[10px] font-mono text-blue-300 max-h-32 overflow-auto whitespace-pre-wrap border border-gray-800";
-            else if (activeAiLayer === 'js') codeEl.className = "bg-gray-900 p-2 rounded text-[10px] font-mono text-yellow-300 max-h-32 overflow-auto whitespace-pre-wrap border border-gray-800";
+                if (activeAiLayer === 'html') codeEl.className = "bg-gray-900 p-2 rounded text-[10px] font-mono text-orange-300 max-h-32 overflow-auto whitespace-pre-wrap border border-gray-800";
+                else if (activeAiLayer === 'css') codeEl.className = "bg-gray-900 p-2 rounded text-[10px] font-mono text-blue-300 max-h-32 overflow-auto whitespace-pre-wrap border border-gray-800";
+                else if (activeAiLayer === 'js') codeEl.className = "bg-gray-900 p-2 rounded text-[10px] font-mono text-yellow-300 max-h-32 overflow-auto whitespace-pre-wrap border border-gray-800";
+                else if (activeAiLayer === 'all') codeEl.className = "bg-gray-900 p-2 rounded text-[10px] font-mono text-emerald-300 max-h-32 overflow-auto whitespace-pre-wrap border border-gray-800";
+            }
         }
 
         window.switchAiLayer = function(layer) {
@@ -1403,36 +1439,40 @@
                 return;
             }
 
-            if (!selectedSourceState || !selectedSourceState.devId) {
-                showToast("முதலில் Preview-ல் மாற்ற வேண்டிய element-ஐ Inspect மூலம் தேர்வு செய்யவும்.", true);
-                return;
-            }
-
             const instruction = document.getElementById('ai-instruction-input').value.trim();
             if (!instruction) {
                 showToast("AI-க்கு என்ன மாற்ற வேண்டும் என்பதை டைப் செய்யவும்!", true);
                 return;
             }
 
+            let effectiveLayer = activeAiLayer;
+            if (activeAiLayer === 'auto') {
+                effectiveLayer = detectLayerFromChatInstruction(instruction);
+                showToast(`Auto Detect: ${effectiveLayer.toUpperCase()} லேயர் கண்டறியப்பட்டது!`);
+            }
+
+            const badgeEl = document.getElementById('ai-detected-layer-badge');
+            if (badgeEl) badgeEl.textContent = `Layer: ${effectiveLayer.toUpperCase()}`;
+
             const elementSelectorTag = selectedElementState.tagName ? 
                 (selectedElementState.tagName + (selectedElementState.id ? '#' + selectedElementState.id : '') + (selectedElementState.classes.length ? '.' + selectedElementState.classes.join('.') : '')) 
                 : "selected element";
 
-            const currentLayerCode = getLayerCodeSnippet(activeAiLayer);
+            const currentLayerCode = getLayerCodeSnippet(effectiveLayer);
 
             const promptText = `Selected Type
-${activeAiLayer.toUpperCase()}
+${effectiveLayer.toUpperCase()}
 
 Selected Element
 ${elementSelectorTag}
 
-Current ${activeAiLayer.toUpperCase()}
+Current ${effectiveLayer.toUpperCase()}
 ${currentLayerCode}
 
 User Request
 ${instruction}
 
-Return ONLY updated ${activeAiLayer.toUpperCase()}. No conversation, no explanations, no markdown fences if possible.`;
+Return ONLY updated ${effectiveLayer.toUpperCase()}. No conversation, no explanations, no markdown fences if possible.`;
 
             isAiProcessing = true;
             const fixBtn = document.getElementById('ai-fix-btn');
@@ -1441,7 +1481,7 @@ Return ONLY updated ${activeAiLayer.toUpperCase()}. No conversation, no explanat
 
             fixBtn.disabled = true;
             fixIcon.className = "fa-solid fa-circle-notch animate-spin";
-            fixBtnText.textContent = `AI is modifying ${activeAiLayer.toUpperCase()} via ${currentProvider.toUpperCase()}...`;
+            fixBtnText.textContent = `AI is modifying ${effectiveLayer.toUpperCase()} via ${currentProvider.toUpperCase()}...`;
 
             try {
                 const rawResponseText = await callAiApi(promptText, apiKey);
@@ -1452,7 +1492,7 @@ Return ONLY updated ${activeAiLayer.toUpperCase()}. No conversation, no explanat
                 }
 
                 pendingAiReplacement = {
-                    layer: activeAiLayer,
+                    layer: effectiveLayer,
                     snapshot: { ...selectedSourceState },
                     elementState: { ...selectedElementState },
                     generatedCode: cleanGeneratedCode
@@ -1467,7 +1507,7 @@ Return ONLY updated ${activeAiLayer.toUpperCase()}. No conversation, no explanat
                     previewContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 }
 
-                showToast(`${activeAiLayer.toUpperCase()} மாற்றம் தயாராக உள்ளது! Review செய்து Apply Change அழுத்தவும்.`);
+                showToast(`${effectiveLayer.toUpperCase()} மாற்றம் தயாராக உள்ளது! Review செய்து Apply Change அழுத்தவும்.`);
 
             } catch (err) {
                 console.error("AI Request Failed:", err);
@@ -1487,19 +1527,27 @@ Return ONLY updated ${activeAiLayer.toUpperCase()}. No conversation, no explanat
 
             if (layer === 'html') {
                 if (currentMode === 'multi') {
-                    const currentHtml = codeStore.html;
-                    const before = currentHtml.slice(0, snapshot.range.start);
-                    const after = currentHtml.slice(snapshot.range.end);
-                    codeStore.html = before + generatedCode + after;
+                    if (snapshot && snapshot.range) {
+                        const currentHtml = codeStore.html;
+                        const before = currentHtml.slice(0, snapshot.range.start);
+                        const after = currentHtml.slice(snapshot.range.end);
+                        codeStore.html = before + generatedCode + after;
+                    } else {
+                        codeStore.html = generatedCode;
+                    }
                 } else {
-                    const currentSingle = codeStore.single || htmlCode.value;
-                    const before = currentSingle.slice(0, snapshot.range.start);
-                    const after = currentSingle.slice(snapshot.range.end);
-                    codeStore.single = before + generatedCode + after;
+                    if (snapshot && snapshot.range) {
+                        const currentSingle = codeStore.single || htmlCode.value;
+                        const before = currentSingle.slice(0, snapshot.range.start);
+                        const after = currentSingle.slice(snapshot.range.end);
+                        codeStore.single = before + generatedCode + after;
+                    } else {
+                        codeStore.single = generatedCode;
+                    }
                 }
             } else if (layer === 'css') {
                 if (currentMode === 'multi') {
-                    if (elementState.cssMatches && elementState.cssMatches.length > 0) {
+                    if (elementState && elementState.cssMatches && elementState.cssMatches.length > 0) {
                         const targetRange = elementState.cssMatches[0];
                         const currentCss = codeStore.css;
                         const before = currentCss.slice(0, targetRange.start);
@@ -1510,7 +1558,7 @@ Return ONLY updated ${activeAiLayer.toUpperCase()}. No conversation, no explanat
                     }
                 } else {
                     const currentSingle = codeStore.single || htmlCode.value;
-                    if (elementState.cssMatches && elementState.cssMatches.length > 0) {
+                    if (elementState && elementState.cssMatches && elementState.cssMatches.length > 0) {
                         const targetRange = elementState.cssMatches[0];
                         const before = currentSingle.slice(0, targetRange.start);
                         const after = currentSingle.slice(targetRange.end);
@@ -1527,7 +1575,7 @@ Return ONLY updated ${activeAiLayer.toUpperCase()}. No conversation, no explanat
                 }
             } else if (layer === 'js') {
                 if (currentMode === 'multi') {
-                    if (elementState.jsMatches && elementState.jsMatches.length > 0) {
+                    if (elementState && elementState.jsMatches && elementState.jsMatches.length > 0) {
                         const targetRange = elementState.jsMatches[0];
                         const jsSrc = codeStore.js;
                         const lines = jsSrc.split('\n');
@@ -1542,7 +1590,7 @@ Return ONLY updated ${activeAiLayer.toUpperCase()}. No conversation, no explanat
                     }
                 } else {
                     const currentSingle = codeStore.single || htmlCode.value;
-                    if (elementState.jsMatches && elementState.jsMatches.length > 0) {
+                    if (elementState && elementState.jsMatches && elementState.jsMatches.length > 0) {
                         const targetRange = elementState.jsMatches[0];
                         const lines = currentSingle.split('\n');
                         const lineIdx = lines.findIndex(l => l.includes(targetRange.label.split(' ')[0]));
@@ -1558,6 +1606,12 @@ Return ONLY updated ${activeAiLayer.toUpperCase()}. No conversation, no explanat
                             codeStore.single += `\n<script>\n${generatedCode}\n<\/script>`;
                         }
                     }
+                }
+            } else if (layer === 'all') {
+                if (currentMode === 'multi') {
+                    codeStore.html = generatedCode;
+                } else {
+                    codeStore.single = generatedCode;
                 }
             }
 
