@@ -857,7 +857,7 @@
             single: `<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <script src="https://cdn.tailwindcss.com"><\/script>\n    <title>Dev Edtr Single File</title>\n    <style>\n        body { background-color: #eff6ff; padding: 2rem; }\n        .buy-btn { background: green; color: white; border-radius: 0.5rem; }\n    </style>\n</head>\n<body>\n    <div class="card max-w-md mx-auto p-6 bg-white rounded-xl shadow-lg">\n        <h1 class="text-2xl font-bold text-blue-600">Single HTML Mode</h1>\n        <button id="buyBtn" class="buy-btn mt-4 px-4 py-2">\n            <span>Buy Now</span>\n        </button>\n    </div>\n    <script>\n        const buyBtn = document.getElementById('buyBtn');\n        if (buyBtn) {\n            buyBtn.addEventListener('click', () => {\n                alert("Buying");\n            });\n        }\n    <\/script>\n</body>\n</html>`
         };
 
-        // AI PROVIDER & MODEL ENGINE (GEMINI + GROQ)
+        // AI PROVIDER & DYNAMIC MODEL ENGINE (GEMINI + GROQ)
         let currentProvider = 'gemini'; // 'gemini' | 'groq'
         let GEMINI_MODEL_NAME = "gemini-2.5-flash"; 
         let GROQ_MODEL_NAME = "llama-3.3-70b-versatile"; 
@@ -1082,7 +1082,7 @@
             }
         }
 
-        // --- GEMINI & GROQ DUAL AI ENGINE ---
+        // --- GEMINI & GROQ DYNAMIC AUTO-FETCH MODEL ENGINE ---
 
         window.switchAiProvider = function() {
             const select = document.getElementById('ai-provider-select');
@@ -1091,24 +1091,40 @@
             loadApiKeyUI();
         };
 
+        // Fetch Live Gemini Models
         async function getAvailableGeminiModels(apiKey) {
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-                if (!response.ok) throw new Error("Models list-ஐ பெற முடியவில்லை.");
+                if (!response.ok) throw new Error("Gemini models list-ஐ பெற முடியவில்லை.");
                 
                 const data = await response.json();
-                
                 return data.models
                     .filter(m => m.name.includes('gemini') && m.supportedGenerationMethods.includes('generateContent'))
                     .map(m => m.name.replace('models/', ''));
             } catch (error) {
-                console.error("Auto fetch models error:", error);
-                return [
-                    "gemini-2.5-flash",
-                    "gemini-3.1-flash-lite",
-                    "gemini-3.5-flash",
-                    "gemini-3-flash-preview"
-                ];
+                console.error("Auto fetch Gemini models error:", error);
+                return ["gemini-2.5-flash", "gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-3-flash-preview"];
+            }
+        }
+
+        // Fetch Live Groq Models (Dynamic Models API)
+        async function getAvailableGroqModels(apiKey) {
+            try {
+                const response = await fetch('https://api.groq.com/openai/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) throw new Error("Groq models list-ஐ பெற முடியவில்லை.");
+                
+                const data = await response.json();
+                return data.data.map(m => m.id);
+            } catch (error) {
+                console.error("Auto fetch Groq models error:", error);
+                return ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"];
             }
         }
 
@@ -1232,19 +1248,34 @@
 
             try {
                 if (currentProvider === 'groq') {
-                    const testRes = await callAiApi("Hi", apiKey);
-                    if (testRes) {
-                        showToast(`வெற்றி! Groq (${GROQ_MODEL_NAME}) இணைக்கப்பட்டது.`);
+                    const availableGroqModels = await getAvailableGroqModels(apiKey);
+                    const priorityGroqModels = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"];
+                    const groqModelsToTry = Array.from(new Set([...priorityGroqModels, ...availableGroqModels]));
+
+                    let workingGroqModel = null;
+                    for (const model of groqModelsToTry) {
+                        try {
+                            GROQ_MODEL_NAME = model;
+                            const testRes = await callAiApi("Hi", apiKey);
+                            if (testRes) {
+                                workingGroqModel = model;
+                                break;
+                            }
+                        } catch (e) {
+                            console.warn(`Groq Model ${model} failed, testing next...`);
+                        }
+                    }
+
+                    if (workingGroqModel) {
+                        GROQ_MODEL_NAME = workingGroqModel;
+                        showToast(`வெற்றி! Groq (${workingGroqModel}) மாடல் இணைக்கப்பட்டது.`);
                         updateApiStatus(true);
+                    } else {
+                        showToast("எந்த Groq மாடலும் வேலை செய்யவில்லை. API Key-ஐ சரிபார்க்கவும்.", true);
                     }
                 } else {
                     const availableModels = await getAvailableGeminiModels(apiKey);
-                    const customModelsToTry = [
-                        "gemini-3.5-flash",        
-                        "gemini-3.1-flash-lite",   
-                        "gemini-2.5-flash",
-                        "gemini-3-flash-preview"
-                    ];
+                    const customModelsToTry = ["gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-3-flash-preview"];
                     const modelsToTry = Array.from(new Set([...customModelsToTry, ...availableModels]));
 
                     let workingModel = null;
@@ -1261,7 +1292,7 @@
                                 break;
                             }
                         } catch (e) {
-                            console.warn(`Model ${model} failed, testing next...`);
+                            console.warn(`Gemini Model ${model} failed, testing next...`);
                         }
                     }
 
