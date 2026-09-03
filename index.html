@@ -8,6 +8,14 @@
     <!-- SVG Data-URI Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232563eb'/><path d='M32 35 L18 50 L32 65 M68 35 L82 50 L68 65 M58 28 L42 72' stroke='%23ffffff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
 
+    <!-- Proper PWA Inline Manifest & Mobile Metadata -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DevEdtr">
+    <link rel="manifest" href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22Dev%20Edtr%20Pro%22%2C%22short_name%22%3A%22DevEdtr%22%2C%22description%22%3A%22Professional%20In-Browser%20Code%20Editor%20%26%20Live%20Preview%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23111827%22%2C%22theme_color%22%3A%22%232563eb%22%2C%22orientation%22%3A%22any%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Crect%20width%3D'100'%20height%3D'100'%20rx%3D'22'%20fill%3D'%232563eb'%2F%3E%3Cpath%20d%3D'M32%2035%20L18%2050%20L32%2065%20M68%2035%20L82%2050%20L68%2065%20M58%2028%20L42%2072'%20stroke%3D'%23ffffff'%20stroke-width%3D'8'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%20fill%3D'none'%2F%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%20512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Load FontAwesome for Icons -->
@@ -26,18 +34,18 @@
             --editor-fg: #d4d4d4;
             --line-num-bg: #2d2d2d;
             --line-num-fg: #858585;
-            --main-bg: #eff6ff; /* Blue-50 */
+            --main-bg: #eff6ff;
             --header-bg: #ffffff;
             --header-text: #2563eb;
-            --border-color: #bfdbfe; /* Blue-200 */
+            --border-color: #bfdbfe;
         }
 
         /* Dark Theme Overrides */
         body.dark-mode {
-            --main-bg: #111827; /* Gray-900 */
-            --header-bg: #1f2937; /* Gray-800 */
-            --header-text: #93c5fd; /* Blue-300 */
-            --border-color: #374151; /* Gray-700 */
+            --main-bg: #111827;
+            --header-bg: #1f2937;
+            --header-text: #93c5fd;
+            --border-color: #374151;
         }
         
         body {
@@ -163,12 +171,10 @@
             padding: 5px;
         }
 
-        /* Console log types */
         .console-log { color: #ccc; }
         .console-error { color: #f87171; font-weight: bold; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2px; } 
         .console-warn { color: #fcd34d; } 
         
-        /* Output frame wrapper for centering */
         .output-wrapper {
             background-color: var(--main-bg);
             display: flex;
@@ -180,7 +186,6 @@
             padding-top: 0;
         }
 
-        /* Editor Mode & Tab Styling */
         .editor-tab-btn {
             padding: 0.5rem 1rem;
             font-size: 0.75rem;
@@ -202,7 +207,6 @@
             background-color: #1e1e1e;
         }
 
-        /* AI Layer Switcher Tab Buttons */
         .ai-layer-tab {
             flex: 1;
             padding: 0.25rem 0.5rem;
@@ -226,7 +230,6 @@
             box-shadow: 0 0 6px rgba(59, 130, 246, 0.4);
         }
 
-        /* Output frame itself */
         #output-frame {
             border: none;
             background-color: white;
@@ -234,7 +237,6 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        /* Full-Screen Mode */
         .fullscreen-mode {
             position: fixed;
             top: 0;
@@ -252,20 +254,17 @@
             display: none !important;
         }
         
-        /* Device Button Active State */
         .device-btn.active {
             background-color: #bfdbfe; 
             color: #1e40af; 
         }
 
-        /* Inspect Button Active State */
         .inspect-btn.active {
             background-color: #3b82f6 !important;
             color: #ffffff !important;
             box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
         }
 
-        /* Scrollbar customization */
         textarea::-webkit-scrollbar, #console-output::-webkit-scrollbar {
             width: 10px;
             height: 10px;
@@ -617,6 +616,12 @@
                 <span>AI Assistant</span>
             </button>
 
+            <!-- PWA Proper Standalone Install Button -->
+            <button id="pwa-install-btn" class="hidden px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-sm transition flex items-center gap-1.5" title="Install App">
+                <i class="fa-solid fa-circle-down"></i>
+                <span>Install App</span>
+            </button>
+
             <!-- Theme Toggle Button -->
             <button onclick="toggleTheme();" id="theme-toggle-btn" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium rounded-lg shadow-sm transition" title="Toggle Theme">
                 <i class="fa-solid fa-moon"></i>
@@ -791,7 +796,7 @@
                 </button>
             </div>
 
-            <!-- Selected Element Info Box & Layer Context Tabs -->
+            <!-- Selected Element Info Box -->
             <div class="bg-gray-800/80 p-2.5 rounded-lg border border-gray-700 text-xs space-y-2">
                 <div class="text-gray-400 font-semibold uppercase text-[10px] tracking-wider">Selected Element:</div>
                 <div id="ai-selected-element-display" class="font-mono text-amber-400 font-bold truncate bg-gray-900 px-2 py-1 rounded border border-gray-800">
@@ -810,7 +815,6 @@
                 </div>
             </div>
 
-            <!-- Instruction Input Box -->
             <div class="flex-1 flex flex-col gap-1.5 min-h-[100px]">
                 <label for="ai-instruction-input" class="text-xs font-semibold text-gray-300">What do you want to change?</label>
                 <textarea id="ai-instruction-input" class="w-full flex-1 bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 resize-none" placeholder="எ.கா: button colour blue, make font size 18px..."></textarea>
@@ -1157,7 +1161,6 @@ function renderProjectFiles() {
 function openProjectFile(filename) {
     if (!projectFiles[filename]) return;
 
-    // எடிட்டரின் மேற்புறத்தில் ஏற்கனவே உள்ள Custom Tab-ஐ அகற்றுதல்
     const existingCustomTab = document.getElementById('tab-custom-file');
     if (existingCustomTab) existingCustomTab.remove();
 
@@ -1167,7 +1170,6 @@ function openProjectFile(filename) {
         if (currentMode !== 'multi') window.switchMode('multi');
         window.switchTab(coreTab);
     } else {
-        // தற்போதுள்ள எடிட்டர் மாற்றங்களை சேமித்தல்
         if (activeProjectFile && !CORE_PROJECT_FILES.includes(activeProjectFile)) {
             projectFiles[activeProjectFile] = { content: htmlCode.value, encoding: 'utf8' };
         } else {
@@ -1178,13 +1180,11 @@ function openProjectFile(filename) {
         htmlCode.value = projectFileContent(filename);
         updateLineNumbers();
 
-        // மற்ற நிலையான Tab பட்டன்களின் Active நிலையை நீக்குதல்
         ['html', 'css', 'js', 'single'].forEach(t => {
             const btn = document.getElementById(`tab-${t}`);
             if (btn) btn.classList.remove('active');
         });
 
-        // Tab Bar-ல் புதிதாகத் திறக்கப்பட்ட கோப்பிற்கான பட்டனை உருவாக்குதல்
         const tabsContainer = document.getElementById('multi-tabs');
         if (tabsContainer) {
             const [icon, color] = getFileType(filename);
@@ -2078,7 +2078,6 @@ window.switchMode = function(mode) {
 };
 
 window.switchTab = function(tab) {
-    // தனிப்பயன் கோப்பு டேப் இருந்தால் அதை நீக்குதல்
     const customTab = document.getElementById('tab-custom-file');
     if (customTab) customTab.remove();
 
@@ -3053,7 +3052,6 @@ ${codeStore.js}
 }
 
 function updateOutput() {
-    // தனிப்பயன் கோப்பாக இருந்தால் projectFiles-ல் சேமித்தல்
     if (activeProjectFile && projectFiles[activeProjectFile] && !CORE_PROJECT_FILES.includes(activeProjectFile)) {
         projectFiles[activeProjectFile].content = htmlCode.value;
     } else {
@@ -3717,10 +3715,75 @@ window.rangeActionExtract = function() {
     showToast("தேர்ந்தெடுக்கப்பட்ட பகுதி மட்டும் வைக்கப்பட்டது!");
 };
 
+// --- PROPER PWA SERVICE WORKER REGISTRATION & INSTALL LOGIC ---
+let deferredPwaPrompt = null;
+
+function initPwaEngine() {
+    const installBtn = document.getElementById('pwa-install-btn');
+
+    // 1. Register Inline Service Worker via Blob (No separate sw.js file needed)
+    if ('serviceWorker' in navigator) {
+        const swCode = `
+            const CACHE_NAME = 'dev-edtr-cache-v1';
+            self.addEventListener('install', (e) => {
+                self.skipWaiting();
+            });
+            self.addEventListener('activate', (e) => {
+                e.waitUntil(clients.claim());
+            });
+            self.addEventListener('fetch', (e) => {
+                e.respondWith(
+                    fetch(e.request).catch(() => caches.match(e.request))
+                );
+            });
+        `;
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(swBlob);
+
+        navigator.serviceWorker.register(swUrl)
+            .then(() => console.log("PWA Service Worker registered successfully!"))
+            .catch(err => console.warn("PWA SW register error:", err));
+    }
+
+    // 2. Standalone Install Prompt Event Listener
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPwaPrompt = e;
+        if (installBtn) {
+            installBtn.classList.remove('hidden');
+        }
+    });
+
+    // 3. User Click Handler for Standalone Installation
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPwaPrompt) return;
+
+            deferredPwaPrompt.prompt();
+            const { outcome } = await deferredPwaPrompt.userChoice;
+
+            if (outcome === 'accepted') {
+                showToast('Dev Edtr Pro செயலி வெற்றிகரமாக நிறுவப்பட்டது!');
+            }
+            deferredPwaPrompt = null;
+            installBtn.classList.add('hidden');
+        });
+    }
+
+    // 4. Hide button once installed
+    window.addEventListener('appinstalled', () => {
+        if (installBtn) installBtn.classList.add('hidden');
+        deferredPwaPrompt = null;
+        showToast('ஆப் உங்கள் கணினியில்/மொபைலில் நிறுவப்பட்டுவிட்டது!');
+    });
+}
+
 // Initialize UI & Events on DOM Load
 window.addEventListener('DOMContentLoaded', () => {
     loadTheme();
     renderProjectFiles();
+    initPwaEngine();
+
     const projectSearch = document.getElementById('project-files-search');
     if (projectSearch) projectSearch.addEventListener('input', renderProjectFiles);
     const upload = document.getElementById('project-file-upload');
