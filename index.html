@@ -3,49 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev Edtr Pro</title>
-
-    <!-- SVG Data-URI Favicon -->
+         <!-- SVG Data-URI Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232563eb'/><path d='M32 35 L18 50 L32 65 M68 35 L82 50 L68 65 M58 28 L42 72' stroke='%23ffffff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
-
-    <!-- Proper PWA Inline Manifest & Mobile Metadata -->
-    <meta name="theme-color" content="#2563eb">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="DevEdtr">
-    <link rel="manifest" href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22Dev%20Edtr%20Pro%22%2C%22short_name%22%3A%22DevEdtr%22%2C%22description%22%3A%22Professional%20In-Browser%20Code%20Editor%20%26%20Live%20Preview%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23111827%22%2C%22theme_color%22%3A%22%232563eb%22%2C%22orientation%22%3A%22any%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Crect%20width%3D'100'%20height%3D'100'%20rx%3D'22'%20fill%3D'%232563eb'%2F%3E%3Cpath%20d%3D'M32%2035%20L18%2050%20L32%2065%20M68%2035%20L82%2050%20L68%2065%20M58%2028%20L42%2072'%20stroke%3D'%23ffffff'%20stroke-width%3D'8'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%20fill%3D'none'%2F%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%20512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
-
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Load Prettier Standalone and Parsers for Formatting -->
-    <script src="https://unpkg.com/prettier@2.8.8/standalone.js"></script>
-    <script src="https://unpkg.com/prettier@2.8.8/parser-html.js"></script>
-    <script src="https://unpkg.com/prettier@2.8.8/parser-postcss.js"></script>
-    <script src="https://unpkg.com/prettier@2.8.8/parser-babel.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-
     <style>
+        /* Dev Edtr Preview Auto-Fit */
+        html, body { max-width: 100%; overflow-x: hidden; }
+        *, *::before, *::after { box-sizing: border-box; }
+        img, video, svg, canvas, iframe { max-width: 100%; }
+        table { max-width: 100%; }
+        pre, code { max-width: 100%; overflow-x: auto; }
+        body {
+    background-color: #f3f4f6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 2rem;
+}
+
+.buy-btn {
+    background: green;
+    color: white;
+    border-radius: .5rem;
+}
+
+.buy-btn:hover {
+    transform: translateY(-1px);
+}
+    </style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+
         /* Base styles (Light Theme Defaults) */
         :root {
             --editor-bg: #1e1e1e;
             --editor-fg: #d4d4d4;
             --line-num-bg: #2d2d2d;
             --line-num-fg: #858585;
-            --main-bg: #eff6ff;
+            --main-bg: #eff6ff; /* Blue-50 */
             --header-bg: #ffffff;
             --header-text: #2563eb;
-            --border-color: #bfdbfe;
+            --border-color: #bfdbfe; /* Blue-200 */
         }
 
         /* Dark Theme Overrides */
         body.dark-mode {
-            --main-bg: #111827;
-            --header-bg: #1f2937;
-            --header-text: #93c5fd;
-            --border-color: #374151;
+            --main-bg: #111827; /* Gray-900 */
+            --header-bg: #1f2937; /* Gray-800 */
+            --header-text: #93c5fd; /* Blue-300 */
+            --border-color: #374151; /* Gray-700 */
         }
         
         body {
@@ -171,10 +182,12 @@
             padding: 5px;
         }
 
+        /* Console log types */
         .console-log { color: #ccc; }
         .console-error { color: #f87171; font-weight: bold; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2px; } 
         .console-warn { color: #fcd34d; } 
         
+        /* Output frame wrapper for centering */
         .output-wrapper {
             background-color: var(--main-bg);
             display: flex;
@@ -186,16 +199,18 @@
             padding-top: 0;
         }
 
+        /* Editor Mode & Tab Styling */
         .editor-tab-btn {
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.8rem;
             font-size: 0.75rem;
             font-weight: 600;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             border-bottom: 2px solid transparent;
             color: #9ca3af;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
         .editor-tab-btn:hover {
             color: #ffffff;
@@ -207,6 +222,7 @@
             background-color: #1e1e1e;
         }
 
+        /* AI Layer Switcher Tab Buttons */
         .ai-layer-tab {
             flex: 1;
             padding: 0.25rem 0.5rem;
@@ -230,6 +246,7 @@
             box-shadow: 0 0 6px rgba(59, 130, 246, 0.4);
         }
 
+        /* Output frame itself */
         #output-frame {
             border: none;
             background-color: white;
@@ -237,6 +254,7 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
+        /* Full-Screen Mode */
         .fullscreen-mode {
             position: fixed;
             top: 0;
@@ -254,25 +272,29 @@
             display: none !important;
         }
         
+        /* Device Button Active State */
         .device-btn.active {
             background-color: #bfdbfe; 
             color: #1e40af; 
         }
 
+        /* Inspect Button Active State */
         .inspect-btn.active {
             background-color: #3b82f6 !important;
             color: #ffffff !important;
             box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
         }
 
-        textarea::-webkit-scrollbar, #console-output::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
+        /* Scrollbar customization */
+        textarea::-webkit-scrollbar, #console-output::-webkit-scrollbar, #multi-tabs::-webkit-scrollbar {
+            width: 8px;
+            height: 6px;
         }
-        textarea::-webkit-scrollbar-track { background: #1e1e1e; }
-        textarea::-webkit-scrollbar-thumb { background: #60a5fa; border-radius: 5px; }
-        textarea::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+        textarea::-webkit-scrollbar-track, #multi-tabs::-webkit-scrollbar-track { background: #1e1e1e; }
+        textarea::-webkit-scrollbar-thumb, #multi-tabs::-webkit-scrollbar-thumb { background: #60a5fa; border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb:hover, #multi-tabs::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
 
+        /* Custom scrollbar for breadcrumb bar */
         #breadcrumb-container::-webkit-scrollbar {
             height: 4px;
         }
@@ -284,6 +306,7 @@
             border-radius: 2px;
         }
         
+        /* Dark mode colors for general elements */
         .dark-mode .header { background-color: var(--header-bg); border-color: var(--border-color); }
         .dark-mode .header h1 { color: var(--header-text); }
         .dark-mode .output-panel-container { background-color: var(--header-bg); border-color: var(--border-color); }
@@ -293,12 +316,14 @@
         .dark-mode .reset-btn { background-color: #1f2937; border-color: #60a5fa; color: #f87171; }
         .dark-mode .reset-btn:hover { background-color: #374151; }
         
+        /* Hidden console state */
         .console-hidden {
             height: 0px !important;
             padding: 0 !important;
             border: none !important;
         }
 
+        /* Range Selector Styling with Dark Theme support */
         .range-selector-panel {
             background-color: #f0f7ff;
             border-top: 1px solid var(--border-color);
@@ -326,6 +351,7 @@
             transform: rotate(180deg);
         }
 
+        /* Desktop split resize handle */
         .split-resizer {
             display: block;
             flex: 0 0 12px;
@@ -428,159 +454,198 @@
                 border-radius: 999px;
             }
         }
-        
-        .project-files-sidebar{width:250px;flex:0 0 250px;min-width:220px;background:var(--header-bg);border:1px solid var(--border-color);border-radius:.75rem;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,.08)}
-        .project-files-header{display:flex;align-items:center;justify-content:space-between;padding:.7rem .8rem;border-bottom:1px solid var(--border-color)}
-        .project-files-list{flex:1;min-height:0;overflow:auto;padding:.35rem}
-        .project-file-row{display:flex;align-items:center;gap:.45rem;padding:.55rem .5rem;border-radius:.5rem;cursor:pointer;color:#374151;min-width:0}
-        .dark-mode .project-file-row{color:#d1d5db}
-        .project-file-row:hover,.project-file-row.active{background:#dbeafe;color:#1d4ed8}
-        .dark-mode .project-file-row:hover,.dark-mode .project-file-row.active{background:#1f3b63;color:#93c5fd}
-        .project-file-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 .75rem/1.2 'Segoe UI',sans-serif}
-        .project-file-type{width:1.25rem;text-align:center;flex:none}
-        .project-file-menu-btn{width:36px;height:36px;flex:none;border:0;background:transparent;border-radius:.45rem;color:#6b7280;cursor:pointer}
-        .project-file-menu-btn:hover{background:rgba(59,130,246,.12);color:#2563eb}
-        .project-files-search{margin:.6rem .6rem 0}
-        .project-files-search input{width:100%;box-sizing:border-box}
-        .project-files-footer{padding:.6rem;border-top:1px solid var(--border-color);display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
-        .project-files-btn{min-height:38px;border:1px solid #bfdbfe;border-radius:.5rem;background:#eff6ff;color:#1d4ed8;font-size:.72rem;font-weight:700;cursor:pointer}
-        .dark-mode .project-files-btn{background:#1f2937;border-color:#374151;color:#93c5fd}
-        .project-files-mobile-trigger{display:none}
-        .project-file-action-menu{position:fixed;z-index:10050;min-width:170px;background:#111827;color:white;border:1px solid #374151;border-radius:.65rem;box-shadow:0 16px 40px rgba(0,0,0,.3);padding:.3rem}
-        .project-file-action-menu button{display:block;width:100%;text-align:left;padding:.55rem .7rem;background:transparent;border:0;color:#e5e7eb;border-radius:.4rem;font-size:.78rem;cursor:pointer}
-        .project-file-action-menu button:hover{background:#1f2937}
-        .project-files-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10020}
-        .download-menu{position:absolute;right:0;top:calc(100% + .35rem);width:190px;background:var(--header-bg);border:1px solid var(--border-color);border-radius:.65rem;box-shadow:0 16px 40px rgba(0,0,0,.18);padding:.3rem;z-index:10040}
-        .download-menu button{width:100%;border:0;background:transparent;text-align:left;padding:.65rem .7rem;border-radius:.45rem;font-size:.78rem;font-weight:700;color:#374151;cursor:pointer}
-        .dark-mode .download-menu button{color:#e5e7eb}
-        .download-menu button:hover{background:#dbeafe;color:#1d4ed8}
+    
+/* ===== Project Files: incremental responsive layer ===== */
+.project-files-sidebar{width:250px;flex:0 0 250px;min-width:220px;background:var(--header-bg);border:1px solid var(--border-color);border-radius:.75rem;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,.08)}
+.project-files-header{display:flex;align-items:center;justify-content:space-between;padding:.7rem .8rem;border-bottom:1px solid var(--border-color)}
+.project-files-list{flex:1;min-height:0;overflow:auto;padding:.35rem}
+.project-file-row{display:flex;align-items:center;gap:.45rem;padding:.55rem .5rem;border-radius:.5rem;cursor:pointer;color:#374151;min-width:0}
+.dark-mode .project-file-row{color:#d1d5db}
+.project-file-row:hover,.project-file-row.active{background:#dbeafe;color:#1d4ed8}
+.dark-mode .project-file-row:hover,.dark-mode .project-file-row.active{background:#1f3b63;color:#93c5fd}
+.project-file-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 .75rem/1.2 'Segoe UI',sans-serif}
+.project-file-type{width:1.25rem;text-align:center;flex:none}
+.project-file-menu-btn{width:36px;height:36px;flex:none;border:0;background:transparent;border-radius:.45rem;color:#6b7280;cursor:pointer}
+.project-file-menu-btn:hover{background:rgba(59,130,246,.12);color:#2563eb}
+.project-files-search{margin:.6rem .6rem 0}
+.project-files-search input{width:100%;box-sizing:border-box}
+.project-files-footer{padding:.6rem;border-top:1px solid var(--border-color);display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.project-files-btn{min-height:38px;border:1px solid #bfdbfe;border-radius:.5rem;background:#eff6ff;color:#1d4ed8;font-size:.72rem;font-weight:700;cursor:pointer}
+.dark-mode .project-files-btn{background:#1f2937;border-color:#374151;color:#93c5fd}
+.project-files-mobile-trigger{display:none}
+.project-file-action-menu{position:fixed;z-index:10050;min-width:170px;background:#111827;color:white;border:1px solid #374151;border-radius:.65rem;box-shadow:0 16px 40px rgba(0,0,0,.3);padding:.3rem}
+.project-file-action-menu button{display:block;width:100%;text-align:left;padding:.55rem .7rem;background:transparent;border:0;color:#e5e7eb;border-radius:.4rem;font-size:.78rem;cursor:pointer}
+.project-file-action-menu button:hover{background:#1f2937}
+.project-files-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10020}
+.download-menu{position:absolute;right:0;top:calc(100% + .35rem);width:190px;background:var(--header-bg);border:1px solid var(--border-color);border-radius:.65rem;box-shadow:0 16px 40px rgba(0,0,0,.18);padding:.3rem;z-index:10040}
+.download-menu button{width:100%;border:0;background:transparent;text-align:left;padding:.65rem .7rem;border-radius:.45rem;font-size:.78rem;font-weight:700;color:#374151;cursor:pointer}
+.dark-mode .download-menu button{color:#e5e7eb}
+.download-menu button:hover{background:#dbeafe;color:#1d4ed8}
+@media(max-width:1023px){
+ .project-files-sidebar{display:none}
+ .project-files-mobile-trigger{display:flex}
+ .main-split{position:relative}
+}
+@media(max-width:767px){
+ body{padding:.35rem!important;overflow:hidden}
+ .header{padding:.55rem!important;margin-bottom:.35rem!important;border-radius:.65rem!important;gap:.45rem!important}
+ .header h1{font-size:1rem!important}
+ #db-status{display:none}
+ .header>div:last-child{width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap!important;padding-bottom:2px}
+ .header>div:last-child>*{flex:none}
+ .header .download-wrap{margin-left:auto}
+ .header button{min-height:42px}
+ .header .mode-toggle-label{display:none}
+ .html-editor-panel,.output-panel-container{min-width:0!important;width:100%!important;border-radius:.6rem!important}
+ .main-split{height:100%;gap:0!important}
+ .html-editor-panel{flex:1 1 58%!important}
+ .output-panel-container{flex:1 1 42%!important}
+ .panel-resizer{display:none!important}
+ .split-resizer{flex:0 0 12px!important;height:12px!important;min-height:12px!important}
+ .split-resizer::before{left:42%;right:42%;height:4px}
+ .editor-tab-btn{padding:.55rem .7rem;font-size:.72rem;min-height:42px}
+ .editor-container{min-height:0}
+ .code-input{font-size:.88rem;line-height:1.5;padding:.7rem}
+ .line-numbers{width:2.2rem;padding:.7rem .35rem;font-size:.88rem}
+ .output-bar{padding:.3rem .45rem!important}
+ .output-bar .device-btn{min-width:40px;min-height:36px}
+ .output-bar .inspect-btn span{display:none}
+ .output-bar .inspect-btn{min-width:40px;min-height:36px;justify-content:center}
+ #info-tooltip{width:min(290px,calc(100vw - 24px));right:0}
+ #inspect-info-bar{font-size:.65rem}
+ #related-code-panel{max-width:100%;overflow-x:auto}
+ #console-output{height:110px!important}
+ #console-output-wrapper{height:110px!important}
+ .range-selector-panel{font-size:.7rem}
+ .range-selector-panel>button{min-height:40px;padding-left:.65rem;padding-right:.65rem}
+ .range-selector-panel .range-text-title span{display:none}
+ .project-files-backdrop{display:block;opacity:0;pointer-events:none;transition:opacity .2s}
+ .project-files-backdrop.open{opacity:1;pointer-events:auto}
+ .project-files-sidebar.mobile-open{display:flex;position:fixed;z-index:10030;top:0;left:0;bottom:0;width:min(88vw,360px);max-width:360px;border-radius:0 .8rem .8rem 0;box-shadow:20px 0 45px rgba(0,0,0,.3);transform:translateX(0);animation:pf-slide-in .2s ease}
+ .project-files-sidebar.mobile-closed{transform:translateX(-110%)}
+ .project-files-header{padding:.8rem}
+ .project-files-search{margin:.65rem}
+ .project-files-footer{padding:.7rem}
+ .project-file-row{min-height:46px;padding:.35rem .4rem}
+ .project-file-menu-btn{min-width:44px;min-height:44px}
+ .project-file-action-menu{min-width:190px;max-width:calc(100vw - 24px)}
+ .project-file-action-menu button{min-height:44px}
+ .download-menu{position:fixed;right:8px;top:72px;width:min(210px,calc(100vw - 16px))}
+ .download-menu button{min-height:46px}
+}
+@media(min-width:768px) and (max-width:1023px){
+ .project-files-sidebar.mobile-open{display:flex;position:fixed;z-index:10030;top:1rem;left:1rem;bottom:1rem;width:min(330px,78vw);box-shadow:20px 0 45px rgba(0,0,0,.25)}
+ .project-files-backdrop.open{display:block;opacity:1;pointer-events:auto}
+}
+@media(max-width:479px){
+ .header>div:first-child h1{font-size:.9rem!important}
+ .header .ai-text,.header .format-text,.header .reset-text{display:none}
+ .header button{padding-left:.65rem!important;padding-right:.65rem!important}
+ .main-split{min-height:0}
+ .ai-layer-tab{min-height:38px}
+}
+@keyframes pf-slide-in{from{transform:translateX(-110%)}to{transform:translateX(0)}}
+body.project-files-open{overflow:hidden}
 
-        @media(max-width:1023px){
-            .project-files-sidebar{display:none}
-            .project-files-mobile-trigger{display:flex}
-            .main-split{position:relative}
-        }
-        @media(max-width:767px){
-            body{padding:.35rem!important;overflow:hidden}
-            .header{padding:.55rem!important;margin-bottom:.35rem!important;border-radius:.65rem!important;gap:.45rem!important}
-            .header h1{font-size:1rem!important}
-            #db-status{display:none}
-            .header>div:last-child{width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap!important;padding-bottom:2px}
-            .header>div:last-child>*{flex:none}
-            .header .download-wrap{margin-left:auto}
-            .header button{min-height:42px}
-            .header .mode-toggle-label{display:none}
-            .html-editor-panel,.output-panel-container{min-width:0!important;width:100%!important;border-radius:.6rem!important}
-            .main-split{height:100%;gap:0!important}
-            .html-editor-panel{flex:1 1 58%!important}
-            .output-panel-container{flex:1 1 42%!important}
-            .panel-resizer{display:none!important}
-            .split-resizer{flex:0 0 12px!important;height:12px!important;min-height:12px!important}
-            .split-resizer::before{left:42%;right:42%;height:4px}
-            .editor-tab-btn{padding:.55rem .7rem;font-size:.72rem;min-height:42px}
-            .editor-container{min-height:0}
-            .code-input{font-size:.88rem;line-height:1.5;padding:.7rem}
-            .line-numbers{width:2.2rem;padding:.7rem .35rem;font-size:.88rem}
-            .output-bar{padding:.3rem .45rem!important}
-            .output-bar .device-btn{min-width:40px;min-height:36px}
-            .output-bar .inspect-btn span{display:none}
-            .output-bar .inspect-btn{min-width:40px;min-height:36px;justify-content:center}
-            #info-tooltip{width:min(290px,calc(100vw - 24px));right:0}
-            #inspect-info-bar{font-size:.65rem}
-            #related-code-panel{max-width:100%;overflow-x:auto}
-            #console-output{height:110px!important}
-            #console-output-wrapper{height:110px!important}
-            .range-selector-panel{font-size:.7rem}
-            .range-selector-panel>button{min-height:40px;padding-left:.65rem;padding-right:.65rem}
-            .range-selector-panel .range-text-title span{display:none}
-            .project-files-backdrop{display:block;opacity:0;pointer-events:none;transition:opacity .2s}
-            .project-files-backdrop.open{opacity:1;pointer-events:auto}
-            .project-files-sidebar.mobile-open{display:flex;position:fixed;z-index:10030;top:0;left:0;bottom:0;width:min(88vw,360px);max-width:360px;border-radius:0 .8rem .8rem 0;box-shadow:20px 0 45px rgba(0,0,0,.3);transform:translateX(0);animation:pf-slide-in .2s ease}
-            .project-files-sidebar.mobile-closed{transform:translateX(-110%)}
-            .project-files-header{padding:.8rem}
-            .project-files-search{margin:.65rem}
-            .project-files-footer{padding:.7rem}
-            .project-file-row{min-height:46px;padding:.35rem .4rem}
-            .project-file-menu-btn{min-width:44px;min-height:44px}
-            .project-file-action-menu{min-width:190px;max-width:calc(100vw - 24px)}
-            .project-file-action-menu button{min-height:44px}
-            .download-menu{position:fixed;right:8px;top:72px;width:min(210px,calc(100vw - 16px))}
-            .download-menu button{min-height:46px}
-        }
-        @media(min-width:768px) and (max-width:1023px){
-            .project-files-sidebar.mobile-open{display:flex;position:fixed;z-index:10030;top:1rem;left:1rem;bottom:1rem;width:min(330px,78vw);box-shadow:20px 0 45px rgba(0,0,0,.25)}
-            .project-files-backdrop.open{display:block;opacity:1;pointer-events:auto}
-        }
-        @media(max-width:479px){
-            .header>div:first-child h1{font-size:.9rem!important}
-            .header .ai-text,.header .format-text,.header .reset-text{display:none}
-            .header button{padding-left:.65rem!important;padding-right:.65rem!important}
-            .main-split{min-height:0}
-            .ai-layer-tab{min-height:38px}
-        }
-        @keyframes pf-slide-in{from{transform:translateX(-110%)}to{transform:translateX(0)}}
-        body.project-files-open{overflow:hidden}
 
-        #console-output-wrapper.console-hidden,
-        #console-output-wrapper[data-console-state="closed"] {
-            height: 0 !important;
-            min-height: 0 !important;
-            max-height: 0 !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            border-top: 0 !important;
-            overflow: hidden !important;
-        }
+/* ===== Mobile console + split-resizer reliability patch ===== */
+#console-output-wrapper.console-hidden,
+#console-output-wrapper[data-console-state="closed"] {
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-top: 0 !important;
+    overflow: hidden !important;
+}
 
-        @media (max-width: 1023px) {
-            #split-resizer {
-                display: block !important;
-                flex: 0 0 18px !important;
-                width: 100% !important;
-                height: 18px !important;
-                min-height: 18px !important;
-                min-width: 0 !important;
-                touch-action: none !important;
-                pointer-events: auto !important;
-                cursor: row-resize !important;
-                z-index: 40 !important;
-            }
-            #split-resizer::before { pointer-events: none !important; }
-            #split-resizer::after { pointer-events: none !important; }
-            #console-toggle-btn {
-                min-width: 44px !important;
-                min-height: 40px !important;
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                touch-action: manipulation !important;
-                position: relative !important;
-                z-index: 50 !important;
-            }
-            #console-output-wrapper {
-                flex: 0 0 auto !important;
-                transition: height .2s ease, max-height .2s ease !important;
-            }
-            #console-output {
-                min-height: 0 !important;
-                height: 150px !important;
-            }
-            body.split-resizing {
-                touch-action: none !important;
-                overflow: hidden !important;
-            }
-        }
-        @media (max-width: 767px) {
-            .html-editor-panel,
-            .output-panel-container {
-                min-height: 0 !important;
-            }
-            #split-resizer {
-                flex-basis: 18px !important;
-                height: 18px !important;
-            }
-        }
+@media (max-width: 1023px) {
+    #split-resizer {
+        display: block !important;
+        flex: 0 0 18px !important;
+        width: 100% !important;
+        height: 18px !important;
+        min-height: 18px !important;
+        min-width: 0 !important;
+        touch-action: none !important;
+        pointer-events: auto !important;
+        cursor: row-resize !important;
+        z-index: 40 !important;
+    }
+
+    #split-resizer::before {
+        pointer-events: none !important;
+    }
+
+    #split-resizer::after {
+        pointer-events: none !important;
+    }
+
+    #console-toggle-btn {
+        min-width: 44px !important;
+        min-height: 40px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        touch-action: manipulation !important;
+        position: relative !important;
+        z-index: 50 !important;
+    }
+
+    #console-output-wrapper {
+        flex: 0 0 auto !important;
+        transition: height .2s ease, max-height .2s ease !important;
+    }
+
+    #console-output {
+        min-height: 0 !important;
+        height: 150px !important;
+    }
+
+    body.split-resizing {
+        touch-action: none !important;
+        overflow: hidden !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .html-editor-panel,
+    .output-panel-container {
+        min-height: 0 !important;
+    }
+
+    #split-resizer {
+        flex-basis: 18px !important;
+        height: 18px !important;
+    }
+}
+
     </style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Edtr</title>
+
+    <!-- SVG Data-URI Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232563eb'/><path d='M32 35 L18 50 L32 65 M68 35 L82 50 L68 65 M58 28 L42 72' stroke='%23ffffff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Load Prettier Standalone and Parsers for Formatting -->
+    <script src="https://unpkg.com/prettier@2.8.8/standalone.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-html.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-postcss.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-babel.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="h-screen flex flex-col p-2 md:p-4">
 
@@ -588,6 +653,7 @@
     <div class="flex-none header bg-white p-3 rounded-xl shadow-md border border-blue-100 mb-3 flex flex-col md:flex-row justify-between items-center gap-3">
         <div class="flex items-center gap-3">
             <h1 class="text-xl font-extrabold text-blue-600"><i class="fa-solid fa-code"></i> Dev Edtr Pro</h1>
+            <!-- Database Connection Status -->
             <span id="db-status" class="text-xs font-semibold px-2 py-1 rounded-full bg-red-100 text-red-600">
                 <i class="fa-solid fa-database mr-1"></i> Database Connecting...
             </span>
@@ -616,12 +682,6 @@
                 <span>AI Assistant</span>
             </button>
 
-            <!-- PWA Proper Standalone Install Button -->
-            <button id="pwa-install-btn" class="hidden px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-sm transition flex items-center gap-1.5" title="Install App">
-                <i class="fa-solid fa-circle-down"></i>
-                <span>Install App</span>
-            </button>
-
             <!-- Theme Toggle Button -->
             <button onclick="toggleTheme();" id="theme-toggle-btn" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium rounded-lg shadow-sm transition" title="Toggle Theme">
                 <i class="fa-solid fa-moon"></i>
@@ -648,7 +708,7 @@
     <!-- Main Split Area -->
     <div class="main-split flex-1 min-h-0">
         
-        <!-- Project Files Sidebar -->
+        <!-- Project Files: same data/actions on desktop, drawer on tablet/mobile -->
         <aside id="project-files-sidebar" class="project-files-sidebar mobile-closed" aria-label="Project Files">
             <div class="project-files-header">
                 <div>
@@ -676,8 +736,8 @@
             
             <!-- Professional Editor Tabs Header -->
             <div class="bg-gray-900 text-white px-2 pt-1.5 flex justify-between items-center select-none flex-none border-b border-gray-800">
-                <!-- Multi-mode Tabs -->
-                <div id="multi-tabs" class="flex items-center gap-1">
+                <!-- Multi-mode Tabs (Dynamically Rendered for all project files) -->
+                <div id="multi-tabs" class="flex items-center gap-1 overflow-x-auto max-w-[calc(100%-110px)] py-0.5">
                     <button onclick="switchTab('html')" id="tab-html" class="editor-tab-btn active">
                         <i class="fa-brands fa-html5 text-orange-500 text-sm"></i> HTML
                     </button>
@@ -697,7 +757,7 @@
                 </div>
 
                 <!-- Character Count Badge -->
-                <div class="pr-2 text-xs text-gray-400 font-mono">
+                <div class="pr-2 text-xs text-gray-400 font-mono shrink-0">
                     <span id="char-count" class="text-blue-400">0 chars</span>
                 </div>
             </div>
@@ -708,7 +768,7 @@
                 <textarea id="html-code" class="code-input" placeholder="<!-- உங்கள் கோடை இங்கே டைப் செய்யவும்... -->" spellcheck="false"></textarea>
             </div>
 
-            <!-- Range Selector Control Section -->
+            <!-- Range Selector Control Section (DEFAULT COLLAPSED/HIDDEN) -->
             <div class="range-selector-panel flex-none">
                 <button onclick="toggleRangeSelector()" class="w-full flex justify-between items-center px-4 py-2 text-xs font-bold text-blue-700 dark:text-blue-300 hover:bg-blue-100/30 dark:hover:bg-gray-700/30 transition select-none">
                     <span class="flex items-center gap-2 range-text-title">
@@ -721,6 +781,7 @@
                     </div>
                 </button>
                 <div id="range-selector-content" class="hidden px-4 pb-3 pt-1 border-t border-blue-100 dark:border-gray-700/50 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                    <!-- Sliders -->
                     <div class="md:col-span-7 space-y-2">
                         <div class="flex items-center gap-4">
                             <div class="flex-1 flex items-center gap-2">
@@ -737,6 +798,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Stats & Actions -->
                     <div class="md:col-span-5 flex flex-wrap gap-2 justify-end">
                         <div class="text-[11px] text-gray-500 range-text-muted w-full flex justify-between border-b border-blue-100 dark:border-gray-700/50 pb-1 mb-1">
                             <span>Selected: <strong id="range-chars-count" class="text-blue-600 dark:text-blue-400">0</strong> chars</span>
@@ -762,11 +824,14 @@
             </div>
         </div>
 
+        <!-- Resizer between Editor and Preview -->
+        
+
         <!-- Desktop Editor / Preview Resize Handle -->
         <div id="split-resizer" class="split-resizer" role="separator" aria-orientation="vertical" aria-label="Resize editor and preview" title="Drag to resize Editor / Preview"></div>
 
         <!-- 2. AI Assistant Panel -->
-        <div id="ai-assistant-panel" class="hidden fixed inset-4 z-50 lg:relative lg:inset-auto lg:w-80 flex-none bg-gray-900 text-white rounded-xl shadow-2xl border border-purple-500/40 flex flex-col overflow-y-auto p-3 gap-3">
+      <div id="ai-assistant-panel" class="hidden fixed inset-4 z-50 lg:relative lg:inset-auto lg:w-80 flex-none bg-gray-900 text-white rounded-xl shadow-2xl border border-purple-500/40 flex flex-col overflow-y-auto p-3 gap-3">
             <div class="flex items-center justify-between border-b border-gray-800 pb-2">
                 <h3 class="font-bold text-sm text-purple-400 flex items-center gap-1.5">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant (Gemini)
@@ -796,36 +861,73 @@
                 </button>
             </div>
 
-            <!-- Selected Element Info Box -->
+            <!-- Selected Element Info Box & Layer Context Tabs -->
             <div class="bg-gray-800/80 p-2.5 rounded-lg border border-gray-700 text-xs space-y-2">
                 <div class="text-gray-400 font-semibold uppercase text-[10px] tracking-wider">Selected Element:</div>
                 <div id="ai-selected-element-display" class="font-mono text-amber-400 font-bold truncate bg-gray-900 px-2 py-1 rounded border border-gray-800">
                     None (Inspect & Select)
                 </div>
 
+                <!-- Layer Context Switcher [ HTML ] [ CSS ] [ JS ] -->
                 <div class="flex items-center gap-1 pt-1">
-                    <button id="ai-layer-tab-html" onclick="switchAiLayer('html')" class="ai-layer-tab active">HTML</button>
-                    <button id="ai-layer-tab-css" onclick="switchAiLayer('css')" class="ai-layer-tab">CSS</button>
-                    <button id="ai-layer-tab-js" onclick="switchAiLayer('js')" class="ai-layer-tab">JS</button>
+                    <button id="ai-layer-tab-html" onclick="switchAiLayer('html')" class="ai-layer-tab active">
+                        HTML
+                    </button>
+                    <button id="ai-layer-tab-css" onclick="switchAiLayer('css')" class="ai-layer-tab">
+                        CSS
+                    </button>
+                    <button id="ai-layer-tab-js" onclick="switchAiLayer('js')" class="ai-layer-tab">
+                        JS
+                    </button>
                 </div>
 
+                <!-- Live Active Layer Preview Box -->
                 <div class="space-y-1 pt-1">
                     <span id="ai-layer-code-title" class="text-[10px] text-gray-400 block font-semibold uppercase tracking-wider">CURRENT HTML</span>
                     <pre id="ai-layer-code-display" class="bg-gray-900 p-2 rounded text-[10px] font-mono text-blue-300 max-h-32 overflow-auto whitespace-pre-wrap border border-gray-800">No element selected</pre>
                 </div>
             </div>
 
+            <!-- Quick AI Actions Bar -->
+            <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+                <button onclick="quickAiAction('generate')" class="p-1.5 bg-blue-950/60 hover:bg-blue-900 text-blue-300 border border-blue-700/40 rounded font-semibold transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-plus-circle"></i> Generate New
+                </button>
+                <button onclick="quickAiAction('refactor')" class="p-1.5 bg-indigo-950/60 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/40 rounded font-semibold transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-broom"></i> Refactor
+                </button>
+                <button onclick="quickAiAction('explain')" class="p-1.5 bg-amber-950/60 hover:bg-amber-900 text-amber-300 border border-amber-700/40 rounded font-semibold transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-lightbulb"></i> Explain
+                </button>
+                <button onclick="quickAiAction('a11y')" class="p-1.5 bg-teal-950/60 hover:bg-teal-900 text-teal-300 border border-teal-700/40 rounded font-semibold transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-universal-access"></i> A11y Audit
+                </button>
+            </div>
+
+            <!-- Instruction Input Box -->
             <div class="flex-1 flex flex-col gap-1.5 min-h-[100px]">
                 <label for="ai-instruction-input" class="text-xs font-semibold text-gray-300">What do you want to change?</label>
                 <textarea id="ai-instruction-input" class="w-full flex-1 bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 resize-none" placeholder="எ.கா: button colour blue, make font size 18px..."></textarea>
             </div>
 
+            <!-- Fix with AI Button -->
             <button id="ai-fix-btn" onclick="requestAiFix()" class="w-full py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold rounded-lg shadow transition flex items-center justify-center gap-2">
                 <i id="ai-fix-icon" class="fa-solid fa-wand-magic-sparkles"></i>
                 <span id="ai-fix-btn-text">✨ Fix with AI</span>
             </button>
 
-            <!-- AI Change Preview -->
+            <!-- AI Explanation Result Panel -->
+            <div id="ai-explanation-container" class="hidden bg-gray-800 p-2.5 rounded-lg border border-amber-500/50 space-y-2 text-xs">
+                <div class="font-bold text-amber-300 flex items-center justify-between">
+                    <span id="ai-explanation-title"><i class="fa-solid fa-circle-info mr-1"></i> AI Explanation</span>
+                    <button onclick="closeAiExplanation()" class="text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div id="ai-explanation-text" class="bg-gray-900 p-2 rounded text-[11px] font-sans text-gray-200 max-h-48 overflow-auto whitespace-pre-wrap leading-relaxed border border-gray-700"></div>
+            </div>
+
+            <!-- AI Change Preview / Confirmation UI -->
             <div id="ai-preview-container" class="hidden bg-gray-800 p-2.5 rounded-lg border border-purple-500/50 space-y-2 text-xs">
                 <div class="font-bold text-purple-300 flex items-center justify-between">
                     <span>AI Change Preview</span>
@@ -850,16 +952,19 @@
             </div>
         </div>
 
-        <!-- 3. Live Output Panel -->
+        <!-- 3. Live Output Panel (Split into Output and Console) -->
         <div class="output-panel-container flex flex-col rounded-xl overflow-hidden shadow-xl border border-blue-200 bg-white relative" style="flex: 1 1 50%; min-width: 280px;">
             <div class="flex justify-between items-center output-bar bg-blue-50 border-b border-blue-100 px-3 py-2 flex-none">
+                <!-- Mac-style Dots -->
                 <div class="flex items-center gap-1.5 hidden sm:flex">
                     <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
                     <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
                     <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
                 </div>
 
+                <!-- Device & Inspect Toggles -->
                 <div class="flex items-center gap-2 mx-auto">
+                    <!-- Inspect Button -->
                     <button id="inspect-btn" onclick="toggleInspectMode()" class="inspect-btn flex items-center gap-1.5 px-3 py-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 rounded-lg text-xs font-bold transition shadow-sm" title="Element Picker (Inspect)">
                         <i class="fa-solid fa-crosshairs"></i>
                         <span>Inspect</span>
@@ -875,10 +980,13 @@
                     </div>
                 </div>
 
+                <!-- Right Side Actions with Help Information Widget -->
                 <div class="flex items-center gap-2 relative">
-                    <button onclick="toggleInfoTooltip()" class="text-amber-500 hover:text-amber-600 px-2 py-1 transition text-sm relative" title="பாதுகாப்பு கட்டுப்பாடுகள்">
+                    <!-- Explain Sandbox Limits Tooltip Button -->
+                    <button onclick="toggleInfoTooltip()" class="text-amber-500 hover:text-amber-600 px-2 py-1 transition text-sm relative" title="ஏன் சில குறியீடுகள் இங்கு வேலை செய்யவில்லை?">
                         <i class="fa-solid fa-circle-info animate-pulse"></i>
                     </button>
+                    
                     <button onclick="openNewTab()" class="text-blue-400 hover:text-blue-700 px-2 py-1 transition" title="Open in New Tab">
                         <i class="fa-solid fa-external-link-alt"></i>
                     </button>
@@ -886,44 +994,55 @@
                         <i class="fa-solid fa-expand"></i>
                     </button>
 
+                    <!-- Embedded Informative Tooltip Menu -->
                     <div id="info-tooltip" class="hidden absolute right-0 top-10 w-72 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700 p-4 rounded-xl shadow-2xl z-50 text-xs">
                         <h4 class="font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5 mb-1.5">
                             <i class="fa-solid fa-triangle-exclamation"></i> பாதுகாப்பு கட்டுப்பாடுகள் (Sandbox Limits)
                         </h4>
                         <p class="text-gray-600 dark:text-gray-300 mb-2 leading-relaxed">
-                            பிரவுசரின் பாதுகாப்பு காரணங்களால் <strong>Camera, Mic, Geolocation, LocalStorage</strong> போன்றவை இந்தச் சிறிய பார்வையில் தடை செய்யப்படலாம்.
+                            பிரவுசரின் கடுமையான பாதுகாப்பு காரணங்களால் <strong>Camera, Mic, Geolocation (இருப்பிடம்), LocalStorage</strong> போன்ற அம்சங்கள் இந்த உட்பொதிக்கப்பட்ட சிறிய பார்வையில் (Iframe) தடை செய்யப்படலாம்.
                         </p>
                         <p class="text-blue-600 dark:text-blue-400 font-semibold mb-2">
-                            முழுமையாக இயங்க <strong>Open in New Tab <i class="fa-solid fa-external-link-alt"></i></strong> அழுத்தவும்!
+                            எந்தவொரு தடையுமின்றி குறியீடுகள் முழுமையாக இயங்க <strong>Open in New Tab <i class="fa-solid fa-external-link-alt"></i></strong> பட்டனை அழுத்தவும்!
+                        </p>
+                        <hr class="border-gray-100 dark:border-gray-750 my-1.5">
+                        <p class="text-[10px] text-gray-400 dark:text-gray-500">
+                            Some security-sensitive features (Camera, Geolocation) are restricted inside nested sub-frames. Run them natively via Open in New Tab.
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Inspect Info Bar -->
+            <!-- Inspect Info Bar & Parent/Child Breadcrumb Navigator Bar -->
             <div id="inspect-info-bar" class="hidden bg-gray-900 text-blue-300 text-xs px-3 py-1.5 border-b border-gray-800 font-mono flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-2 min-w-0 flex-1">
                     <span class="text-gray-400 font-sans font-bold text-[11px] uppercase tracking-wider shrink-0">Selected:</span>
+                    <!-- Interactive Breadcrumb Hierarchy Wrapper -->
                     <div id="breadcrumb-container" class="flex items-center gap-1 overflow-x-auto whitespace-nowrap py-0.5 max-w-full">
                         <span id="inspect-element-tag" class="text-amber-400 font-bold">none</span>
                     </div>
                 </div>
 
+                <!-- Related Code Buttons Panel -->
                 <div id="related-code-panel" class="flex items-center gap-1.5 bg-gray-800/80 px-2 py-1 rounded-lg border border-gray-700/60 shrink-0 select-none">
                     <span class="text-[10px] text-gray-400 font-sans font-semibold mr-0.5">RELATED:</span>
-                    <button id="related-btn-html" onclick="clickRelatedTab('html')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 transition flex items-center gap-1">
+                    
+                    <!-- HTML Button -->
+                    <button id="related-btn-html" onclick="clickRelatedTab('html')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 transition flex items-center gap-1" title="Jump to HTML Source">
                         <i class="fa-brands fa-html5 text-orange-400"></i> HTML <span id="related-count-html" class="text-orange-300">✓</span>
                     </button>
                     
+                    <!-- CSS Button / Dropdown Container -->
                     <div class="relative inline-block">
-                        <button id="related-btn-css" onclick="clickRelatedTab('css')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition flex items-center gap-1">
+                        <button id="related-btn-css" onclick="clickRelatedTab('css')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition flex items-center gap-1" title="Jump to Related CSS">
                             <i class="fa-brands fa-css3-alt text-blue-400"></i> CSS <span id="related-count-css" class="bg-blue-600/50 px-1 rounded text-[10px] text-blue-200">0</span>
                         </button>
                         <div id="related-dropdown-css" class="hidden absolute right-0 top-full mt-1 w-52 bg-gray-800 border border-gray-700 rounded-md shadow-2xl z-50 py-1 max-h-40 overflow-y-auto"></div>
                     </div>
 
+                    <!-- JS Button / Dropdown Container -->
                     <div class="relative inline-block">
-                        <button id="related-btn-js" onclick="clickRelatedTab('js')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition flex items-center gap-1">
+                        <button id="related-btn-js" onclick="clickRelatedTab('js')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition flex items-center gap-1" title="Jump to Related JS">
                             <i class="fa-brands fa-js text-yellow-400"></i> JS <span id="related-count-js" class="bg-yellow-600/50 px-1 rounded text-[10px] text-yellow-200">0</span>
                         </button>
                         <div id="related-dropdown-js" class="hidden absolute right-0 top-full mt-1 w-56 bg-gray-800 border border-gray-700 rounded-md shadow-2xl z-50 py-1 max-h-40 overflow-y-auto"></div>
@@ -933,6 +1052,7 @@
                 <span id="inspect-status-msg" class="text-[11px] text-gray-400 font-sans italic shrink-0 hidden lg:inline">Click an element to map source code</span>
             </div>
             
+            <!-- Iframe Output Area -->
             <div class="output-wrapper">
                 <iframe id="output-frame" class="w-full h-full" 
                         sandbox="allow-downloads allow-forms allow-modals allow-pointer-lock allow-popups allow-presentation allow-same-origin allow-scripts" 
@@ -949,21 +1069,28 @@
                     <button onclick="clearConsole()" class="text-xs text-gray-400 hover:text-white px-1 py-0.5 transition" title="Clear Console">
                         <i class="fa-solid fa-xmark mr-1"></i> Clear
                     </button>
+                    <!-- Console Hide/Show Toggle Button -->
                     <button onclick="toggleConsolePanel()" id="console-toggle-btn" class="text-xs text-gray-400 hover:text-white px-1 py-0.5 transition" title="Hide/Show Console">
                         <i id="console-toggle-icon" class="fa-solid fa-angle-up"></i>
                     </button>
                 </div>
             </div>
+            <!-- Console Output Panel (DEFAULT COLLAPSED/HIDDEN) -->
             <div id="console-output-wrapper" class="flex-none h-[150px] console-hidden">
                 <pre id="console-output" class="h-full p-2 overflow-y-auto font-mono text-xs"></pre>
             </div>
         </div>
+
     </div>
 
     <!-- Custom Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 bg-blue-900 text-white px-4 py-2 rounded shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
         செயல் வெற்றிகரமாக முடிந்தது!
     </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
 
     <script>
 // Global variables exposed for onclick handlers
@@ -974,7 +1101,7 @@ let isInspectActive = false;
 let globalSourceMap = {};
 
 let currentBlobUrl = null;
-let activeAiLayer = 'html';
+let activeAiLayer = 'html'; // Current Selected Layer in AI Panel: 'html' | 'css' | 'js'
 
 let selectedElementState = {
     devId: null,
@@ -991,7 +1118,7 @@ let selectedSourceState = null;
 let pendingAiReplacement = null;
 
 // ===== Incremental Generic Project File System =====
-let activeProjectFile = null;
+let activeProjectFile = 'index.html';
 let projectFiles = {};
 let projectName = 'Dev Edtr Project';
 const CORE_PROJECT_FILES = ['index.html', 'style.css', 'script.js'];
@@ -1059,6 +1186,7 @@ function saveProjectFiles() {
         }));
     } catch (e) { console.warn('Project storage error:', e); }
     renderProjectFiles();
+    renderEditorTabs();
 }
 
 function loadProjectFilesFromStore(parsed) {
@@ -1074,6 +1202,7 @@ function loadProjectFilesFromStore(parsed) {
     projectName = (parsed && typeof parsed.projectName === 'string' && parsed.projectName.trim()) ? parsed.projectName.trim() : 'Dev Edtr Project';
     syncCoreProjectFiles();
     renderProjectFiles();
+    renderEditorTabs();
 }
 
 function uniqueProjectFilename(filename) {
@@ -1158,12 +1287,63 @@ function renderProjectFiles() {
     if (mobileCount) mobileCount.textContent = count;
 }
 
+// --- DYNAMIC TABS RENDERER FOR MULTI-TAB VIEW ---
+function renderEditorTabs() {
+    const tabsContainer = document.getElementById('multi-tabs');
+    if (!tabsContainer || currentMode !== 'multi') return;
+
+    tabsContainer.innerHTML = '';
+
+    // Standard 3 Core files
+    const coreTabs = [
+        { id: 'html', file: 'index.html', label: 'HTML', icon: 'fa-brands fa-html5 text-orange-500' },
+        { id: 'css', file: 'style.css', label: 'CSS', icon: 'fa-brands fa-css3-alt text-blue-400' },
+        { id: 'js', file: 'script.js', label: 'JS', icon: 'fa-brands fa-js text-yellow-400' }
+    ];
+
+    coreTabs.forEach(tab => {
+        const btn = document.createElement('button');
+        btn.id = `tab-${tab.id}`;
+        const isActive = (activeTab === tab.id && (!activeProjectFile || activeProjectFile === tab.file));
+        btn.className = `editor-tab-btn ${isActive ? 'active' : ''}`;
+        btn.innerHTML = `<i class="${tab.icon}"></i> ${tab.label}`;
+        btn.onclick = () => switchTab(tab.id);
+        tabsContainer.appendChild(btn);
+    });
+
+    // Custom additional project files
+    Object.keys(projectFiles).forEach(filename => {
+        if (!CORE_PROJECT_FILES.includes(filename)) {
+            const btn = document.createElement('button');
+            const isActive = (activeProjectFile === filename);
+            btn.className = `editor-tab-btn ${isActive ? 'active' : ''}`;
+            const [icon, color] = getFileType(filename);
+            
+            btn.innerHTML = `<i class="${icon} ${color}"></i> <span>${filename}</span>`;
+            
+            // Close tab cross button
+            const closeSpan = document.createElement('span');
+            closeSpan.className = 'ml-1.5 text-gray-500 hover:text-red-400 p-0.5 rounded transition';
+            closeSpan.innerHTML = '<i class="fa-solid fa-xmark text-[10px]"></i>';
+            closeSpan.title = 'Close Tab';
+            closeSpan.onclick = (e) => {
+                e.stopPropagation();
+                if (activeProjectFile === filename) {
+                    switchTab('html');
+                } else {
+                    renderEditorTabs();
+                }
+            };
+            btn.appendChild(closeSpan);
+
+            btn.onclick = () => openProjectFile(filename);
+            tabsContainer.appendChild(btn);
+        }
+    });
+}
+
 function openProjectFile(filename) {
     if (!projectFiles[filename]) return;
-
-    const existingCustomTab = document.getElementById('tab-custom-file');
-    if (existingCustomTab) existingCustomTab.remove();
-
     if (CORE_PROJECT_FILES.includes(filename)) {
         const coreTab = filename === 'index.html' ? 'html' : filename === 'style.css' ? 'css' : 'js';
         activeProjectFile = filename;
@@ -1175,32 +1355,17 @@ function openProjectFile(filename) {
         } else {
             codeStore[activeTab] = htmlCode.value;
         }
-
+        
         activeProjectFile = filename;
+        activeTab = filename;
         htmlCode.value = projectFileContent(filename);
         updateLineNumbers();
-
-        ['html', 'css', 'js', 'single'].forEach(t => {
-            const btn = document.getElementById(`tab-${t}`);
-            if (btn) btn.classList.remove('active');
-        });
-
-        const tabsContainer = document.getElementById('multi-tabs');
-        if (tabsContainer) {
-            const [icon, color] = getFileType(filename);
-            const customTabBtn = document.createElement('button');
-            customTabBtn.id = 'tab-custom-file';
-            customTabBtn.className = 'editor-tab-btn active';
-            customTabBtn.innerHTML = `<i class="${icon} ${color} text-sm"></i> <span>${filename}</span>`;
-            tabsContainer.appendChild(customTabBtn);
-        }
-
         if (getFileExtension(filename) === 'env') {
             showToast('Warning: .env is not secure secret storage in browser projects.');
         }
         charCount.textContent = `${htmlCode.value.length} chars`;
         renderProjectFiles();
-
+        renderEditorTabs();
         if (getFileExtension(filename) === 'json' && !validateJsonFile(filename, htmlCode.value)) {
             showToast('JSON syntax பிழை உள்ளது. Format செய்ய முயற்சிக்கவும்.', true);
         } else {
@@ -1239,6 +1404,7 @@ function renameProjectFile(oldName) {
     if (activeProjectFile === oldName) activeProjectFile = newName;
     saveProjectFiles();
     renderProjectFiles();
+    renderEditorTabs();
 }
 
 function duplicateProjectFile(filename) {
@@ -1355,7 +1521,6 @@ window.downloadProjectFile = downloadProjectFile;
 window.renameProjectFile = renameProjectFile;
 window.duplicateProjectFile = duplicateProjectFile;
 window.deleteProjectFile = deleteProjectFile;
-
 const codeStore = {
     html: ``,
     css: ``,
@@ -1363,6 +1528,7 @@ const codeStore = {
     single: ``
 };
 
+// இயல்புநிலை மாடல்
 let GEMINI_MODEL_NAME = localStorage.getItem('dev_edtr_gemini_model') || '';
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
@@ -1388,7 +1554,7 @@ const body = document.body;
 const themeToggleBtn = document.getElementById('theme-toggle-btn');
 const dbStatus = document.getElementById('db-status');
 
-// --- FEATURE 1: AUTO FORMAT CODE ---
+// --- FEATURE 1: AUTO FORMAT CODE (PRETTIER INTEGRATION) ---
 window.formatCurrentCode = function() {
     try {
         const unformatted = htmlCode.value;
@@ -1430,7 +1596,7 @@ window.formatCurrentCode = function() {
     }
 };
 
-// --- PANEL RESIZER ---
+// --- PANEL RESIZER (Editor ↔ Preview drag to resize) ---
 let isResizingPanels = false;
 
 function initPanelResizer() {
@@ -1489,6 +1655,35 @@ function initPanelResizer() {
             }
         }
     });
+
+    // Touch support
+    panelResizer.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isResizingPanels = true;
+        panelResizer.classList.add('dragging');
+        body.classList.add('resizing-panels');
+    }, { passive: false });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!isResizingPanels || !e.touches[0]) return;
+        const mainSplit = document.querySelector('.main-split');
+        if (!mainSplit) return;
+        const rect = mainSplit.getBoundingClientRect();
+        const aiPanel = document.getElementById('ai-assistant-panel');
+        const aiWidth = (aiPanel && !aiPanel.classList.contains('hidden')) ? aiPanel.offsetWidth + 8 : 0;
+        let availableWidth = rect.width - aiWidth - 10;
+        let editorWidth = e.touches[0].clientX - rect.left;
+        editorWidth = Math.max(220, Math.min(editorWidth, availableWidth - 280));
+        applySplitRatio(editorWidth / availableWidth);
+    }, { passive: false });
+
+    document.addEventListener('touchend', () => {
+        if (isResizingPanels) {
+            isResizingPanels = false;
+            panelResizer.classList.remove('dragging');
+            body.classList.remove('resizing-panels');
+        }
+    });
 }
 
 function applySplitRatio(ratio) {
@@ -1514,6 +1709,7 @@ async function initFirebase() {
         onAuthStateChanged = firebaseAuth.onAuthStateChanged;
         getFirestore = firebaseFs.getFirestore;
 
+        const appId = typeof window.__app_id !== 'undefined' ? window.__app_id : 'default-app-id';
         const firebaseConfig = typeof window.__firebase_config !== 'undefined' ? JSON.parse(window.__firebase_config) : null;
         const initialAuthToken = typeof window.__initial_auth_token !== 'undefined' ? window.__initial_auth_token : null;
 
@@ -1560,6 +1756,7 @@ async function initFirebase() {
 }
 
 // --- GEMINI API KEY MANAGEMENT ---
+
 async function getAvailableGeminiModels(apiKey) {
     if (!apiKey) return [];
     try {
@@ -1606,6 +1803,7 @@ async function testGeminiModel(apiKey, modelName, prompt = 'Reply with OK') {
         });
         return response.ok;
     } catch (error) {
+        console.warn(`Gemini model ${model} failed`, error);
         return false;
     }
 }
@@ -1736,7 +1934,8 @@ window.testApiKey = async function() {
     }
 };
 
-// --- AI LAYER CONTEXT SWITCHER ---
+// --- AI LAYER CONTEXT SWITCHER & DISPLAY ENGINE ---
+
 function getLayerCodeSnippet(layerType) {
     if (!selectedSourceState && layerType === 'html') return codeStore.html || "";
 
@@ -1796,6 +1995,7 @@ window.switchAiLayer = function(layer) {
     updateAiLayerDisplay();
 };
 
+// --- AI INSTRUCTION & MULTI-LAYER (HTML, CSS, JS) REPLACEMENT ENGINE ---
 function sanitizeAiResponse(responseText) {
     if (!responseText) return '';
     let clean = responseText.trim();
@@ -1809,6 +2009,15 @@ window.requestAiFix = async function() {
     if (isAiProcessing) return;
 
     let apiKey = getSavedApiKey();
+    if (!apiKey) {
+        const inputKey = document.getElementById('ai-api-key-input')?.value.trim();
+        if (inputKey) {
+            apiKey = inputKey;
+            localStorage.setItem('gemini_api_key_dev_edtr', apiKey);
+            updateApiStatus(true);
+        }
+    }
+
     if (!apiKey) {
         showToast("Gemini API Key இல்லை! AI Assistant panel-ல் API Key உள்ளிடவும்.", true);
         document.getElementById('ai-assistant-panel').classList.remove('hidden');
@@ -1865,7 +2074,7 @@ DO NOT include markdown syntax around JSON if possible, no markdown backticks, n
     fixBtnText.textContent = `AI is updating HTML, CSS & JS...`;
 
     try {
-        const data = await callGemini(promptText, apiKey);
+const data = await callGemini(promptText, apiKey);
         const rawResponseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
         const cleanGeneratedJson = sanitizeAiResponse(rawResponseText);
 
@@ -1914,6 +2123,7 @@ window.applyAiChange = function() {
 
     const { snapshot, elementState, generatedHtml, generatedCss, generatedJs } = pendingAiReplacement;
 
+    // 1. Apply HTML Changes
     if (generatedHtml) {
         if (currentMode === 'multi') {
             if (snapshot && snapshot.range) {
@@ -1934,6 +2144,7 @@ window.applyAiChange = function() {
         }
     }
 
+    // 2. Apply CSS Changes
     if (generatedCss) {
         if (currentMode === 'multi') {
             if (elementState && elementState.cssMatches && elementState.cssMatches.length > 0) {
@@ -1964,6 +2175,7 @@ window.applyAiChange = function() {
         }
     }
 
+    // 3. Apply JS Changes
     if (generatedJs) {
         if (currentMode === 'multi') {
             if (elementState && elementState.jsMatches && elementState.jsMatches.length > 0) {
@@ -2001,6 +2213,7 @@ window.applyAiChange = function() {
     }
 
     htmlCode.value = codeStore[activeTab] || '';
+
     updateOutput();
     saveCodeLocal();
     cancelAiChange();
@@ -2015,6 +2228,160 @@ window.cancelAiChange = function() {
     }
 };
 
+// --- NEW ADVANCED AI FEATURES: QUICK ACTIONS (GENERATE, REFACTOR, EXPLAIN, A11Y) ---
+
+window.closeAiExplanation = function() {
+    const el = document.getElementById('ai-explanation-container');
+    if (el) el.classList.add('hidden');
+};
+
+window.quickAiAction = async function(actionType) {
+    let apiKey = getSavedApiKey();
+    if (!apiKey) {
+        showToast("முதலில் Gemini API Key-ஐ அமைக்கவும்!", true);
+        document.getElementById('ai-assistant-panel').classList.remove('hidden');
+        return;
+    }
+
+    const currentHtml = codeStore.html || (currentMode === 'single' ? codeStore.single : '');
+    const currentCss = codeStore.css || '';
+    const currentJs = codeStore.js || '';
+    const instructionInput = document.getElementById('ai-instruction-input');
+    const userPrompt = instructionInput.value.trim();
+
+    if (actionType === 'generate' && !userPrompt) {
+        showToast("நீங்கள் என்ன உருவாக்க விரும்புகிறீர்கள் என்பதை 'What do you want to change?' பெட்டியில் டைப் செய்யவும்!", true);
+        instructionInput.focus();
+        return;
+    }
+
+    showToast("AI செயல்முறை தொடங்குகிறது...");
+    const fixBtn = document.getElementById('ai-fix-btn');
+    fixBtn.disabled = true;
+
+    try {
+        if (actionType === 'explain') {
+            const promptText = `Explain the following code snippet simply and concisely in Tamil. Highlight what each section does and any key features or improvements.
+Layer: ${activeTab.toUpperCase()}
+Code:
+${htmlCode.value}`;
+
+            const data = await callGemini(promptText, apiKey);
+            const explanation = data.candidates?.[0]?.content?.parts?.[0]?.text || 'விளக்கம் கிடைக்கவில்லை.';
+            
+            const expContainer = document.getElementById('ai-explanation-container');
+            const expTitle = document.getElementById('ai-explanation-title');
+            const expText = document.getElementById('ai-explanation-text');
+
+            if (expContainer && expText) {
+                expTitle.innerHTML = `<i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i> குறியீடு விளக்கம் (Explanation)`;
+                expText.textContent = explanation;
+                expContainer.classList.remove('hidden');
+                expContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+            showToast("குறியீடு விளக்கம் தயார்!");
+        } 
+        else if (actionType === 'a11y') {
+            const promptText = `Review this HTML/CSS for Web Accessibility (WCAG / a11y) and SEO. 
+HTML:
+${currentHtml}
+
+Provide a concise audit in Tamil pointing out missing alt tags, ARIA attributes, semantic structure, or color contrast issues. Suggest quick fixes.`;
+
+            const data = await callGemini(promptText, apiKey);
+            const auditReport = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Audit தகவல் கிடைக்கவில்லை.';
+
+            const expContainer = document.getElementById('ai-explanation-container');
+            const expTitle = document.getElementById('ai-explanation-title');
+            const expText = document.getElementById('ai-explanation-text');
+
+            if (expContainer && expText) {
+                expTitle.innerHTML = `<i class="fa-solid fa-universal-access text-teal-400 mr-1"></i> A11y & SEO Audit`;
+                expText.textContent = auditReport;
+                expContainer.classList.remove('hidden');
+                expContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+            showToast("Accessibility Audit முடிந்தது!");
+        }
+        else if (actionType === 'refactor') {
+            const promptText = `Refactor the following code to make it clean, performant, and well-structured. Remove unused CSS or redundant JS. Preserve all functional logic.
+Return ONLY a valid JSON object matching this structure:
+{
+  "html": "refactored html",
+  "css": "refactored css",
+  "js": "refactored js"
+}
+DO NOT wrap with markdown fences. Just raw JSON.
+
+HTML:
+${currentHtml}
+CSS:
+${currentCss}
+JS:
+${currentJs}`;
+
+            const data = await callGemini(promptText, apiKey);
+            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const cleanJson = sanitizeAiResponse(rawText);
+            const parsed = JSON.parse(cleanJson);
+
+            pendingAiReplacement = {
+                snapshot: null,
+                elementState: null,
+                generatedHtml: parsed.html || currentHtml,
+                generatedCss: parsed.css || currentCss,
+                generatedJs: parsed.js || currentJs
+            };
+
+            const previewOriginal = document.getElementById('ai-preview-original');
+            const previewModified = document.getElementById('ai-preview-modified');
+            if (previewOriginal) previewOriginal.textContent = `Current HTML, CSS & JS`;
+            if (previewModified) previewModified.textContent = `--- Refactored Code ---\nHTML: ${(parsed.html||'').length} chars\nCSS: ${(parsed.css||'').length} chars\nJS: ${(parsed.js||'').length} chars`;
+
+            document.getElementById('ai-preview-container')?.classList.remove('hidden');
+            showToast("Refactor முடிந்தது! Review செய்து Apply அழுத்தவும்.");
+        }
+        else if (actionType === 'generate') {
+            const promptText = `Generate a modern, beautiful web component based on this prompt: "${userPrompt}".
+Use semantic HTML, Tailwind CSS or pure CSS, and functional JavaScript where required.
+Return ONLY a valid JSON object matching this structure:
+{
+  "html": "complete component html",
+  "css": "supporting css rules or empty if tailwind",
+  "js": "supporting interactive js or empty"
+}
+DO NOT wrap with markdown fences. Just raw JSON.`;
+
+            const data = await callGemini(promptText, apiKey);
+            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const cleanJson = sanitizeAiResponse(rawText);
+            const parsed = JSON.parse(cleanJson);
+
+            pendingAiReplacement = {
+                snapshot: null,
+                elementState: null,
+                generatedHtml: parsed.html || '',
+                generatedCss: parsed.css || '',
+                generatedJs: parsed.js || ''
+            };
+
+            const previewOriginal = document.getElementById('ai-preview-original');
+            const previewModified = document.getElementById('ai-preview-modified');
+            if (previewOriginal) previewOriginal.textContent = `(New Component Generation)`;
+            if (previewModified) previewModified.textContent = `--- Generated HTML ---\n${parsed.html||''}\n\n--- CSS ---\n${parsed.css||''}\n\n--- JS ---\n${parsed.js||''}`;
+
+            document.getElementById('ai-preview-container')?.classList.remove('hidden');
+            showToast("Component உருவாக்கப்பட்டது! Apply Change அழுத்தவும்.");
+        }
+    } catch (err) {
+        console.error("Quick AI Action Error:", err);
+        showToast(`AI பிழை: ${err.message}`, true);
+    } finally {
+        fixBtn.disabled = false;
+    }
+};
+
+// --- FEATURE 4: CONSOLE AI ERROR AUTO-FIXER ENGINE ---
 window.fixConsoleErrorWithAi = async function(errorMessage) {
     let apiKey = getSavedApiKey();
     if (!apiKey) {
@@ -2067,6 +2434,7 @@ window.switchMode = function(mode) {
         singleBtn.className = "px-2.5 py-1 text-xs font-bold rounded-md transition text-gray-600 dark:text-gray-300 hover:text-blue-600";
         multiTabs.classList.remove('hidden');
         singleTabs.classList.add('hidden');
+        renderEditorTabs();
         switchTab('html');
     } else {
         singleBtn.className = "px-2.5 py-1 text-xs font-bold rounded-md transition bg-blue-600 text-white shadow-sm";
@@ -2078,33 +2446,31 @@ window.switchMode = function(mode) {
 };
 
 window.switchTab = function(tab) {
-    const customTab = document.getElementById('tab-custom-file');
-    if (customTab) customTab.remove();
-
     if (activeProjectFile && !CORE_PROJECT_FILES.includes(activeProjectFile)) {
         projectFiles[activeProjectFile] = { content: htmlCode.value, encoding: 'utf8' };
     } else {
         codeStore[activeTab] = htmlCode.value;
     }
-    activeProjectFile = tab === 'html' ? 'index.html' : tab === 'css' ? 'style.css' : tab === 'js' ? 'script.js' : null;
+    
+    activeProjectFile = tab === 'html' ? 'index.html' : tab === 'css' ? 'style.css' : tab === 'js' ? 'script.js' : tab;
     activeTab = tab;
 
-    ['html', 'css', 'js', 'single'].forEach(t => {
-        const btn = document.getElementById(`tab-${t}`);
-        if (btn) {
-            if (t === activeTab) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        }
-    });
+    renderEditorTabs();
 
-    htmlCode.value = codeStore[activeTab] || '';
+    if (activeTab === 'html') htmlCode.placeholder = "";
+    else if (activeTab === 'css') htmlCode.placeholder = "";
+    else if (activeTab === 'js') htmlCode.placeholder = "";
+    else if (activeTab === 'single') htmlCode.placeholder = "";
+
+    if (CORE_PROJECT_FILES.includes(activeProjectFile) || tab === 'single') {
+        htmlCode.value = codeStore[activeTab] || '';
+    } else if (projectFiles[activeProjectFile]) {
+        htmlCode.value = projectFileContent(activeProjectFile);
+    }
     updateOutput();
 };
 
-// --- RESPONSIVE RESIZER ---
+// --- RESPONSIVE EDITOR / PREVIEW DRAG RESIZER ---
 function initSplitResizer() {
     const resizer = document.getElementById('split-resizer');
     const mainSplit = document.querySelector('.main-split');
@@ -2253,6 +2619,18 @@ function initSplitResizer() {
         requestAnimationFrame(applySavedRatio);
     });
 
+    const observer = new MutationObserver(() => {
+        requestAnimationFrame(applySavedRatio);
+    });
+
+    const aiPanel = document.getElementById('ai-assistant-panel');
+    if (aiPanel) {
+        observer.observe(aiPanel, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+    }
+
     applySavedRatio();
 }
 
@@ -2279,6 +2657,7 @@ window.toggleInfoTooltip = function() {
     tooltip.classList.toggle('hidden');
 };
 
+// --- CONSOLE LOGIC & AI ERROR FIX BUTTON INTEGRATION ---
 if (consoleOutputWrapper) {
     if (!consoleOutputWrapper.classList.contains('console-hidden')) {
         consoleOutputWrapper.classList.add('console-hidden');
@@ -2387,6 +2766,7 @@ function hijackConsole(iframe) {
     }
 }
 
+// --- Line Number Logic ---
 function updateLineNumbers() {
     const lines = htmlCode.value.split('\n').length;
     lineNumbers.innerHTML = Array(lines).fill(0).map((_, i) => i + 1).join('<br>');
@@ -2397,6 +2777,7 @@ function syncScroll() {
     lineNumbers.scrollTop = htmlCode.scrollTop;
 }
 
+// --- EDITOR FUNCTIONS ---
 window.setDevice = function(mode) {
     deviceBtns.forEach(btn => btn.classList.remove('active'));
 
@@ -2430,7 +2811,7 @@ window.toggleFullscreen = function() {
     fullscreenButton.innerHTML = isFullscreen ? '<i class="fa-solid fa-compress"></i>' : '<i class="fa-solid fa-expand"></i>';
 };
 
-// --- RAW HTML TOKENIZER ---
+// --- RAW HTML TOKENIZER & EXACT CHARACTER OFFSET PARSER ---
 function createHtmlSourceMapAndInjectedHtml(rawHtml) {
     const sourceMap = {};
     if (!rawHtml || typeof rawHtml !== 'string') {
@@ -2585,6 +2966,7 @@ function createHtmlSourceMapAndInjectedHtml(rawHtml) {
     return { injectedHtml, sourceMap };
 }
 
+// --- CSS AND JS MATCHING & PARSING ENGINES ---
 function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -2599,6 +2981,7 @@ function matchesCssSelector(selectorText, elementInfo) {
         if (!sub) continue;
 
         const cleanSub = sub.replace(/::?[a-zA-Z0-9_-]+(\([^\)]*\))?/g, '').trim();
+
         if (id && cleanSub.includes('#' + id)) return true;
 
         for (const cls of classes) {
@@ -3032,6 +3415,7 @@ function getCompiledHTML(includeInspectScript = true) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"><\/script>
     <style>
+        /* Dev Edtr Preview Auto-Fit */
         html, body { max-width: 100%; overflow-x: hidden; }
         *, *::before, *::after { box-sizing: border-box; }
         img, video, svg, canvas, iframe { max-width: 100%; }
@@ -3052,12 +3436,11 @@ ${codeStore.js}
 }
 
 function updateOutput() {
-    if (activeProjectFile && projectFiles[activeProjectFile] && !CORE_PROJECT_FILES.includes(activeProjectFile)) {
-        projectFiles[activeProjectFile].content = htmlCode.value;
+    if (activeProjectFile && !CORE_PROJECT_FILES.includes(activeProjectFile)) {
+        projectFiles[activeProjectFile] = { content: htmlCode.value, encoding: 'utf8' };
     } else {
         codeStore[activeTab] = htmlCode.value;
     }
-    
     charCount.textContent = `${htmlCode.value.length} chars`;
     updateLineNumbers(); 
 
@@ -3110,6 +3493,7 @@ window.toggleInspectMode = function() {
     }
 };
 
+// --- RELATED CODE UI RENDERER & TAB HANDLERS ---
 function scrollEditorToOffset(offset) {
     const currentSourceCode = htmlCode.value;
     const linesBefore = currentSourceCode.substring(0, offset).split('\n').length;
@@ -3156,7 +3540,9 @@ window.clickRelatedTab = function(type) {
             if (cssDropdown) cssDropdown.classList.add('hidden');
             selectCssMatch(matches[0]);
         } else {
-            if (cssDropdown) cssDropdown.classList.toggle('hidden');
+            if (cssDropdown) {
+                cssDropdown.classList.toggle('hidden');
+            }
         }
     } else if (type === 'js') {
         if (cssDropdown) cssDropdown.classList.add('hidden');
@@ -3172,7 +3558,9 @@ window.clickRelatedTab = function(type) {
             if (jsDropdown) jsDropdown.classList.add('hidden');
             selectJsMatch(matches[0]);
         } else {
-            if (jsDropdown) jsDropdown.classList.toggle('hidden');
+            if (jsDropdown) {
+                jsDropdown.classList.toggle('hidden');
+            }
         }
     }
 };
@@ -3252,6 +3640,7 @@ function updateRelatedCodePanel() {
     }
 }
 
+// --- BREADCRUMB UI RENDERER & INTERACTION HANDLER ---
 function renderBreadcrumbs(hierarchy, currentDevId) {
     const container = document.getElementById('breadcrumb-container');
     if (!container) return;
@@ -3265,6 +3654,7 @@ function renderBreadcrumbs(hierarchy, currentDevId) {
 
     hierarchy.forEach((item, index) => {
         const isLast = index === hierarchy.length - 1;
+        
         const btn = document.createElement('button');
         btn.className = `hover:underline cursor-pointer px-1 py-0.5 rounded text-xs font-semibold transition ${
             isLast 
@@ -3275,7 +3665,9 @@ function renderBreadcrumbs(hierarchy, currentDevId) {
 
         btn.onclick = (e) => {
             e.stopPropagation();
-            if (item.devId) selectElementByDevId(item.devId);
+            if (item.devId) {
+                selectElementByDevId(item.devId);
+            }
         };
 
         btn.onmouseenter = () => {
@@ -3344,9 +3736,11 @@ function parseTagInfoFallback(tagInfo) {
     return { tagName, id, classes, inlineEvents: [] };
 }
 
+// Handle Messages Posted from Output Iframe
 window.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'DEV_EDTR_ELEMENT_SELECTED') {
         const { devId, tagInfo, hierarchy, elementDetails } = event.data;
+        
         const details = elementDetails || parseTagInfoFallback(tagInfo);
 
         let htmlRange = null;
@@ -3431,10 +3825,8 @@ window.addEventListener('message', (event) => {
 
 function saveCodeLocal() {
     try {
-        if (activeProjectFile && projectFiles[activeProjectFile] && !CORE_PROJECT_FILES.includes(activeProjectFile)) {
-            projectFiles[activeProjectFile].content = htmlCode.value;
-        } else {
-            codeStore[activeTab] = htmlCode.value;
+        if (activeProjectFile && !CORE_PROJECT_FILES.includes(activeProjectFile)) {
+            projectFiles[activeProjectFile] = { content: htmlCode.value, encoding: 'utf8' };
         }
         syncCoreProjectFiles();
         localStorage.setItem('liveEditor_pro_store', JSON.stringify({
@@ -3445,6 +3837,7 @@ function saveCodeLocal() {
             projectName
         }));
         renderProjectFiles();
+        renderEditorTabs();
     } catch (e) { console.warn("Local storage error:", e); }
 }
 
@@ -3715,75 +4108,11 @@ window.rangeActionExtract = function() {
     showToast("தேர்ந்தெடுக்கப்பட்ட பகுதி மட்டும் வைக்கப்பட்டது!");
 };
 
-// --- PROPER PWA SERVICE WORKER REGISTRATION & INSTALL LOGIC ---
-let deferredPwaPrompt = null;
-
-function initPwaEngine() {
-    const installBtn = document.getElementById('pwa-install-btn');
-
-    // 1. Register Inline Service Worker via Blob (No separate sw.js file needed)
-    if ('serviceWorker' in navigator) {
-        const swCode = `
-            const CACHE_NAME = 'dev-edtr-cache-v1';
-            self.addEventListener('install', (e) => {
-                self.skipWaiting();
-            });
-            self.addEventListener('activate', (e) => {
-                e.waitUntil(clients.claim());
-            });
-            self.addEventListener('fetch', (e) => {
-                e.respondWith(
-                    fetch(e.request).catch(() => caches.match(e.request))
-                );
-            });
-        `;
-        const swBlob = new Blob([swCode], { type: 'application/javascript' });
-        const swUrl = URL.createObjectURL(swBlob);
-
-        navigator.serviceWorker.register(swUrl)
-            .then(() => console.log("PWA Service Worker registered successfully!"))
-            .catch(err => console.warn("PWA SW register error:", err));
-    }
-
-    // 2. Standalone Install Prompt Event Listener
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPwaPrompt = e;
-        if (installBtn) {
-            installBtn.classList.remove('hidden');
-        }
-    });
-
-    // 3. User Click Handler for Standalone Installation
-    if (installBtn) {
-        installBtn.addEventListener('click', async () => {
-            if (!deferredPwaPrompt) return;
-
-            deferredPwaPrompt.prompt();
-            const { outcome } = await deferredPwaPrompt.userChoice;
-
-            if (outcome === 'accepted') {
-                showToast('Dev Edtr Pro செயலி வெற்றிகரமாக நிறுவப்பட்டது!');
-            }
-            deferredPwaPrompt = null;
-            installBtn.classList.add('hidden');
-        });
-    }
-
-    // 4. Hide button once installed
-    window.addEventListener('appinstalled', () => {
-        if (installBtn) installBtn.classList.add('hidden');
-        deferredPwaPrompt = null;
-        showToast('ஆப் உங்கள் கணினியில்/மொபைலில் நிறுவப்பட்டுவிட்டது!');
-    });
-}
-
 // Initialize UI & Events on DOM Load
 window.addEventListener('DOMContentLoaded', () => {
     loadTheme();
     renderProjectFiles();
-    initPwaEngine();
-
+    renderEditorTabs();
     const projectSearch = document.getElementById('project-files-search');
     if (projectSearch) projectSearch.addEventListener('input', renderProjectFiles);
     const upload = document.getElementById('project-file-upload');
@@ -3841,6 +4170,7 @@ window.addEventListener('DOMContentLoaded', () => {
         upload.value = '';
         saveProjectFiles();
         renderProjectFiles();
+        renderEditorTabs();
 
         if (importedCore.length) {
             currentMode = 'multi';
@@ -3857,7 +4187,7 @@ window.addEventListener('DOMContentLoaded', () => {
             activeProjectFile = tab === 'html' ? 'index.html' : tab === 'css' ? 'style.css' : 'script.js';
             activeTab = tab;
             htmlCode.value = codeStore[tab] || '';
-            ['html','css','js','single'].forEach(t => document.getElementById(`tab-${t}`)?.classList.toggle('active', t === tab));
+            renderEditorTabs();
             updateLineNumbers();
             updateOutput();
             saveCodeLocal();
@@ -3968,7 +4298,20 @@ window.addEventListener('DOMContentLoaded', () => {
         if (window.innerWidth >= 1024) closeProjectFiles();
     });
     renderProjectFiles();
+    renderEditorTabs();
 });
     </script>
+    
+</body>
+</html>
+    <script>
+const buyBtn = document.getElementById("buyBtn");
+if (buyBtn) {
+    buyBtn.addEventListener("click", () => {
+        alert("Buying");
+    });
+}
+    </script>
+    
 </body>
 </html>
