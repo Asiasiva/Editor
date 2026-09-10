@@ -569,11 +569,19 @@
                         background:#1f2937; color:#93c5fd; border-color:#374151;
                     }
                     @media (min-width: 1024px) {
-                        .project-files-sidebar.pf-top-hidden { display:none; }
+                        /* Desktop: hidden by default; only the top-left button opens it. */
+                        .project-files-sidebar {
+                            display: none !important;
+                        }
                         .project-files-sidebar.pf-top-open {
-                            display:flex; position:fixed; z-index:10030;
-                            top:10px; left:10px; bottom:10px;
-                            width:250px; height:calc(100vh - 20px);
+                            display: flex !important;
+                            position: fixed;
+                            z-index: 10030;
+                            top: 10px;
+                            left: 10px;
+                            bottom: 10px;
+                            width: 250px;
+                            height: calc(100vh - 20px);
                         }
                     }
                     @media (max-width:767px) {
@@ -1239,7 +1247,14 @@
                                         </button>
                                     </div>
                                 </div>
-                                
+                                <button
+                                    onclick="openProjectFiles();"
+                                    class="project-files-mobile-trigger px-3 py-2 bg-gray-800 text-white text-sm font-semibold rounded-lg shadow-sm"
+                                    title="Project Files"
+                                >
+                                    <i class="fa-solid fa-folder-open mr-1"></i>
+                                    Files <span id="mobile-file-count">0</span>
+                                </button>
                             </div>
                         </div>
 
@@ -2797,9 +2812,13 @@ No element selected</pre
                         if (!panel) return;
                         if (window.innerWidth >= 1024) {
                             const isOpen = panel.classList.contains("pf-top-open");
-                            panel.classList.toggle("pf-top-open", !isOpen);
-                            panel.classList.toggle("pf-top-hidden", isOpen);
-                            if (!isOpen) {
+                            if (isOpen) {
+                                panel.classList.remove("pf-top-open");
+                                panel.classList.remove("mobile-open");
+                                panel.classList.add("mobile-closed");
+                                document.body.classList.remove("project-files-open");
+                            } else {
+                                panel.classList.add("pf-top-open");
                                 panel.classList.remove("mobile-closed");
                                 renderProjectFiles();
                             }
