@@ -561,12 +561,16 @@
                         border-radius: 0.55rem;
                         background: #ffffff;
                         color: #2563eb;
-                        box-shadow: 0 4px 12px rgba(0,0,0,.12);
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
                         cursor: pointer;
                     }
-                    .project-files-top-trigger:hover { background:#dbeafe; }
+                    .project-files-top-trigger:hover {
+                        background: #dbeafe;
+                    }
                     .dark-mode .project-files-top-trigger {
-                        background:#1f2937; color:#93c5fd; border-color:#374151;
+                        background: #1f2937;
+                        color: #93c5fd;
+                        border-color: #374151;
                     }
                     @media (min-width: 1024px) {
                         /* Desktop: hidden by default; only the top-left button opens it. */
@@ -584,8 +588,13 @@
                             height: calc(100vh - 20px);
                         }
                     }
-                    @media (max-width:767px) {
-                        .project-files-top-trigger { top:7px; left:7px; width:38px; height:38px; }
+                    @media (max-width: 767px) {
+                        .project-files-top-trigger {
+                            top: 7px;
+                            left: 7px;
+                            width: 38px;
+                            height: 38px;
+                        }
                     }
 
                     /* ===== Project Files: incremental responsive layer ===== */
@@ -1116,7 +1125,13 @@
                         <link rel="stylesheet" href="styles.css" />
                     </head>
                     <body class="h-screen flex flex-col p-2 md:p-4">
-                        <button type="button" class="project-files-top-trigger" onclick="toggleTopProjectFiles(event)" title="Project Files" aria-label="Project Files">
+                        <button
+                            type="button"
+                            class="project-files-top-trigger"
+                            onclick="toggleTopProjectFiles(event)"
+                            title="Project Files"
+                            aria-label="Project Files"
+                        >
                             <i class="fa-solid fa-bars"></i>
                         </button>
 
@@ -1247,7 +1262,6 @@
                                         </button>
                                     </div>
                                 </div>
-                                
                             </div>
                         </div>
 
@@ -1262,13 +1276,13 @@
                                 <div class="project-files-header">
                                     <div>
                                         <div
-                                            class="text-xs font-extrabold text-blue-600 uppercase tracking-wider"
+                                            class="text-xs font-extrabold text-blue-600 uppercase tracking-wider translate-x-[50px]"
                                         >
                                             Project Files
                                         </div>
                                         <div
                                             id="project-file-count"
-                                            class="text-[10px] text-gray-500"
+                                            class="text-[10px] text-gray-500 ml-[50px]"
                                         >
                                             0 files
                                         </div>
@@ -1413,7 +1427,6 @@
 
                                 <!-- Range Selector Control Section (DEFAULT COLLAPSED/HIDDEN) -->
                                 <div class="range-selector-panel flex-none">
-                                    
                                     <div
                                         id="range-selector-content"
                                         class="hidden px-4 pb-3 pt-1 border-t border-blue-100 dark:border-gray-700/50 grid grid-cols-1 md:grid-cols-12 gap-3 items-center"
@@ -2801,22 +2814,28 @@ No element selected</pre
 
                     function toggleTopProjectFiles(event) {
                         event?.stopPropagation();
-                        const panel = document.getElementById("project-files-sidebar");
+                        const panel = document.getElementById(
+                            "project-files-sidebar"
+                        );
                         if (!panel) return;
                         if (window.innerWidth >= 1024) {
-                            const isOpen = panel.classList.contains("pf-top-open");
+                            const isOpen =
+                                panel.classList.contains("pf-top-open");
                             if (isOpen) {
                                 panel.classList.remove("pf-top-open");
                                 panel.classList.remove("mobile-open");
                                 panel.classList.add("mobile-closed");
-                                document.body.classList.remove("project-files-open");
+                                document.body.classList.remove(
+                                    "project-files-open"
+                                );
                             } else {
                                 panel.classList.add("pf-top-open");
                                 panel.classList.remove("mobile-closed");
                                 renderProjectFiles();
                             }
                         } else {
-                            const isOpen = panel.classList.contains("mobile-open");
+                            const isOpen =
+                                panel.classList.contains("mobile-open");
                             if (isOpen) {
                                 closeProjectFiles();
                             } else {
@@ -2826,7 +2845,9 @@ No element selected</pre
                     }
 
                     function toggleProjectFiles() {
-                        const panel = document.getElementById("project-files-sidebar");
+                        const panel = document.getElementById(
+                            "project-files-sidebar"
+                        );
                         if (!panel) return;
 
                         if (panel.classList.contains("mobile-open")) {
