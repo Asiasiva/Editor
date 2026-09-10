@@ -546,6 +546,40 @@
                         }
                     }
 
+                    /* ===== Project Files top-left button (non-invasive) ===== */
+                    .project-files-top-trigger {
+                        position: fixed;
+                        top: 10px;
+                        left: 10px;
+                        z-index: 10060;
+                        width: 40px;
+                        height: 40px;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        border: 1px solid #bfdbfe;
+                        border-radius: 0.55rem;
+                        background: #ffffff;
+                        color: #2563eb;
+                        box-shadow: 0 4px 12px rgba(0,0,0,.12);
+                        cursor: pointer;
+                    }
+                    .project-files-top-trigger:hover { background:#dbeafe; }
+                    .dark-mode .project-files-top-trigger {
+                        background:#1f2937; color:#93c5fd; border-color:#374151;
+                    }
+                    @media (min-width: 1024px) {
+                        .project-files-sidebar.pf-top-hidden { display:none; }
+                        .project-files-sidebar.pf-top-open {
+                            display:flex; position:fixed; z-index:10030;
+                            top:10px; left:10px; bottom:10px;
+                            width:250px; height:calc(100vh - 20px);
+                        }
+                    }
+                    @media (max-width:767px) {
+                        .project-files-top-trigger { top:7px; left:7px; width:38px; height:38px; }
+                    }
+
                     /* ===== Project Files: incremental responsive layer ===== */
                     .project-files-sidebar {
                         width: 250px;
@@ -1074,6 +1108,10 @@
                         <link rel="stylesheet" href="styles.css" />
                     </head>
                     <body class="h-screen flex flex-col p-2 md:p-4">
+                        <button type="button" class="project-files-top-trigger" onclick="toggleTopProjectFiles(event)" title="Project Files" aria-label="Project Files">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+
                         <!-- Header and Controls -->
                         <div
                             class="flex-none header bg-white p-3 rounded-xl shadow-md border border-blue-100 mb-3 flex flex-col md:flex-row justify-between items-center gap-3"
@@ -1201,14 +1239,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <button
-                                    onclick="openProjectFiles();"
-                                    class="project-files-mobile-trigger px-3 py-2 bg-gray-800 text-white text-sm font-semibold rounded-lg shadow-sm"
-                                    title="Project Files"
-                                >
-                                    <i class="fa-solid fa-folder-open mr-1"></i>
-                                    Files <span id="mobile-file-count">0</span>
-                                </button>
+                                
                             </div>
                         </div>
 
@@ -2556,12 +2587,9 @@ No element selected</pre
                                     '<i class="fa-solid fa-xmark text-[10px]"></i>';
                                 closeSpan.title = "Close Tab";
                                 closeSpan.onclick = (e) => {
+                                    e.preventDefault();
                                     e.stopPropagation();
-                                    if (activeProjectFile === filename) {
-                                        switchTab("html");
-                                    } else {
-                                        renderEditorTabs();
-                                    }
+                                    deleteProjectFile(filename);
                                 };
                                 btn.appendChild(closeSpan);
 
@@ -2763,6 +2791,39 @@ No element selected</pre
                         closeProjectFileActionMenu();
                     }
 
+                    function toggleTopProjectFiles(event) {
+                        event?.stopPropagation();
+                        const panel = document.getElementById("project-files-sidebar");
+                        if (!panel) return;
+                        if (window.innerWidth >= 1024) {
+                            const isOpen = panel.classList.contains("pf-top-open");
+                            panel.classList.toggle("pf-top-open", !isOpen);
+                            panel.classList.toggle("pf-top-hidden", isOpen);
+                            if (!isOpen) {
+                                panel.classList.remove("mobile-closed");
+                                renderProjectFiles();
+                            }
+                        } else {
+                            const isOpen = panel.classList.contains("mobile-open");
+                            if (isOpen) {
+                                closeProjectFiles();
+                            } else {
+                                openProjectFiles();
+                            }
+                        }
+                    }
+
+                    function toggleProjectFiles() {
+                        const panel = document.getElementById("project-files-sidebar");
+                        if (!panel) return;
+
+                        if (panel.classList.contains("mobile-open")) {
+                            closeProjectFiles();
+                        } else {
+                            openProjectFiles();
+                        }
+                    }
+
                     function openProjectFiles() {
                         const panel = document.getElementById(
                             "project-files-sidebar"
@@ -2776,6 +2837,9 @@ No element selected</pre
                         backdrop?.classList.add("open");
                         document.body.classList.add("project-files-open");
                         renderProjectFiles();
+                        if (typeof renderMultiTabs === "function") {
+                            renderMultiTabs();
+                        }
                     }
 
                     function getProjectZipName() {
@@ -2837,6 +2901,7 @@ No element selected</pre
 
                     window.newProjectFile = newProjectFile;
                     window.openProjectFiles = openProjectFiles;
+                    window.toggleProjectFiles = toggleProjectFiles;
                     window.closeProjectFiles = closeProjectFiles;
                     window.downloadProjectZip = downloadProjectZip;
                     window.toggleDownloadMenu = toggleDownloadMenu;
