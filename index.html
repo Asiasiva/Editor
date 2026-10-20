@@ -6872,7 +6872,8 @@ ${codeStore.js}
                                 }
                             });
                         // Find feature: searches the active editor without changing code.
-                        function toggleFindPanel(forceOpen) {
+                        // Expose Find handlers on window so inline buttons work consistently on hosted pages.
+                        window.toggleFindPanel = function toggleFindPanel(forceOpen) {
                             const panel = document.getElementById("find-panel");
                             if (!panel) return;
                             const shouldOpen = typeof forceOpen === "boolean"
@@ -6886,9 +6887,9 @@ ${codeStore.js}
                                     query.select();
                                 }
                             }
-                        }
+                        };
 
-                        function findInEditor(direction = 1) {
+                        window.findInEditor = function findInEditor(direction = 1) {
                             const queryEl = document.getElementById("find-query");
                             const status = document.getElementById("find-status");
                             const editor = document.getElementById("html-code");
@@ -6921,7 +6922,7 @@ ${codeStore.js}
                             const before = source.slice(0, index);
                             const line = before.split("\\n").length;
                             status.textContent = `Match at line ${line} · position ${index + 1}`;
-                        }
+                        };
 
                         const findQueryInput = document.getElementById("find-query");
                         if (findQueryInput) {
