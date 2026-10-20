@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dev-edtr-pwa-v2';
+const CACHE_NAME = 'dev-edtr-pwa-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
