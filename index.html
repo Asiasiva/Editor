@@ -1203,6 +1203,18 @@
                                     <span>Format</span>
                                 </button>
 
+                                <!-- Find in current editor -->
+                                <button
+                                    type="button"
+                                    onclick="toggleFindPanel();"
+                                    id="find-toggle-btn"
+                                    class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer"
+                                    title="Find in current editor (Ctrl+F)"
+                                >
+                                    <i class="fa-solid fa-magnifying-glass pointer-events-none"></i>
+                                    <span class="pointer-events-none">Find</span>
+                                </button>
+
                                 <!-- AI Assistant Toggle Button -->
                                 <button
                                     onclick="toggleAiPanel();"
@@ -1263,6 +1275,20 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Find panel: searches the currently active editor only -->
+                        <div id="find-panel" class="hidden fixed top-20 right-4 z-[10070] w-[min(360px,calc(100vw-24px))] bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700 rounded-xl shadow-2xl p-3">
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="find-query" class="text-sm font-bold text-blue-700 dark:text-blue-300"><i class="fa-solid fa-magnifying-glass mr-1"></i> Find in editor</label>
+                                <button type="button" onclick="toggleFindPanel(false)" class="text-gray-500 hover:text-red-500 px-2 py-1" aria-label="Close Find"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="flex gap-2">
+                                <input id="find-query" type="search" placeholder="Search text..." class="min-w-0 flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                                <button type="button" onclick="findInEditor(-1)" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg" title="Previous match"><i class="fa-solid fa-chevron-up"></i></button>
+                                <button type="button" onclick="findInEditor(1)" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg" title="Next match"><i class="fa-solid fa-chevron-down"></i></button>
+                            </div>
+                            <div id="find-status" class="text-xs text-gray-500 mt-2" aria-live="polite">Type text to find.</div>
                         </div>
 
                         <!-- Main Split Area -->
@@ -6846,6 +6872,81 @@ ${codeStore.js}
                                     );
                                 }
                             });
+                        // Find feature: searches the active editor without changing code.
+                        function toggleFindPanel(forceOpen) {
+                            const panel = document.getElementById("find-panel");
+                            if (!panel) return;
+                            const shouldOpen = typeof forceOpen === "boolean"
+                                ? forceOpen
+                                : panel.classList.contains("hidden");
+                            panel.classList.toggle("hidden", !shouldOpen);
+                            if (shouldOpen) {
+                                const query = document.getElementById("find-query");
+                                if (query) {
+                                    query.focus();
+                                    query.select();
+                                }
+                            }
+                        }
+
+                        function findInEditor(direction = 1) {
+                            const queryEl = document.getElementById("find-query");
+                            const status = document.getElementById("find-status");
+                            const editor = document.getElementById("html-code");
+                            if (!queryEl || !status || !editor) return;
+                            const query = queryEl.value;
+                            if (!query) {
+                                status.textContent = "Type text to find.";
+                                return;
+                            }
+                            const source = editor.value;
+                            const lowerSource = source.toLocaleLowerCase();
+                            const lowerQuery = query.toLocaleLowerCase();
+                            const startAt = direction < 0
+                                ? Math.max(0, editor.selectionStart - 1)
+                                : editor.selectionEnd;
+                            let index = direction < 0
+                                ? lowerSource.lastIndexOf(lowerQuery, startAt)
+                                : lowerSource.indexOf(lowerQuery, startAt);
+                            if (index === -1) {
+                                index = direction < 0
+                                    ? lowerSource.lastIndexOf(lowerQuery)
+                                    : lowerSource.indexOf(lowerQuery, 0);
+                            }
+                            if (index === -1) {
+                                status.textContent = "No matches found.";
+                                return;
+                            }
+                            editor.focus();
+                            editor.setSelectionRange(index, index + query.length);
+                            const before = source.slice(0, index);
+                            const line = before.split("\\n").length;
+                            status.textContent = `Match at line ${line} · position ${index + 1}`;
+                        }
+
+                        const findQueryInput = document.getElementById("find-query");
+                        if (findQueryInput) {
+                            findQueryInput.addEventListener("keydown", (event) => {
+                                if (event.key === "Enter") {
+                                    event.preventDefault();
+                                    findInEditor(event.shiftKey ? -1 : 1);
+                                }
+                                if (event.key === "Escape") toggleFindPanel(false);
+                            });
+                            findQueryInput.addEventListener("input", () => {
+                                const status = document.getElementById("find-status");
+                                if (status) status.textContent = findQueryInput.value
+                                    ? "Press Enter or use the arrows to find."
+                                    : "Type text to find.";
+                            });
+                        }
+                        document.addEventListener("keydown", (event) => {
+                            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f") {
+                                event.preventDefault();
+                                toggleFindPanel(true);
+                            }
+                        });
+
                         initFirebase();
                         loadApiKeyUI();
                         initSplitResizer();
