@@ -208,6 +208,10 @@
                         white-space: pre;
                         overflow: auto;
                     }
+                    .code-input::selection {
+                        background: #f59e0b !important;
+                        color: #111827 !important;
+                    }
 
                     /* Console Styles */
                     #console-output-wrapper {
@@ -398,9 +402,52 @@
                         border-color: #3b82f6;
                     }
                     .dark-mode .reset-btn {
-                        background-color: #1f2937;
-                        border-color: #60a5fa;
-                        color: #f87171;
+                        background: linear-gradient(to right, #ef4444, #e11d48);
+                        border-color: #f87171;
+                        color: #ffffff;
+                    }
+
+.dark-mode .reset-btn:hover {
+                        background: linear-gradient(to right, #dc2626, #be123c);
+                    }
+
+.project-file-action-menu button {
+                        display: block;
+                        width: 100%;
+                        text-align: left;
+                        padding: 0.55rem 0.7rem;
+                        background: transparent;
+                        border: 0;
+                        color: #e5e7eb;
+                        border-radius: 0.4rem;
+                        font-size: 0.78rem;
+                        cursor: pointer;
+                    }
+
+.project-file-action-menu button:hover {
+                        background: #1f2937;
+                    }
+
+.download-menu button {
+                        width: 100%;
+                        border: 0;
+                        background: transparent;
+                        text-align: left;
+                        padding: 0.65rem 0.7rem;
+                        border-radius: 0.45rem;
+                        font-size: 0.78rem;
+                        font-weight: 700;
+                        color: #374151;
+                        cursor: pointer;
+                    }
+
+.dark-mode .download-menu button {
+                        color: #e5e7eb;
+                    }
+
+.download-menu button:hover {
+                        background: #dbeafe;
+                        color: #1d4ed8;
                     }
                     .dark-mode .reset-btn:hover {
                         background-color: #374151;
@@ -1187,7 +1234,7 @@
 
                                 <button
                                     onclick="clearCode();"
-                                    class="reset-btn px-4 py-2 bg-white border border-blue-200 text-red-500 hover:bg-red-50 hover:text-red-600 text-sm font-medium rounded-lg shadow-sm transition"
+                                    class="reset-btn px-4 py-2 bg-gradient-to-r from-red-500 to-rose-600 border border-red-400 text-white hover:from-red-600 hover:to-rose-700 hover:text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5"
                                     title="Reset Instantly"
                                 >
                                     <i class="fa-solid fa-trash mr-1"></i>
@@ -1312,13 +1359,7 @@
                                             0 files
                                         </div>
                                     </div>
-                                    <button
-                                        onclick="closeProjectFiles();"
-                                        class="text-gray-500 hover:text-red-500 p-2"
-                                        aria-label="Close Project Files"
-                                    >
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
+                                    
                                 </div>
                                 <div class="project-files-search">
                                     <input
@@ -4909,11 +4950,78 @@ Return ONLY the complete fixed code for this layer. No conversational text, no e
                             outputFrame.style.width = "375px";
                             outputFrame.style.height = "667px";
                             outputFrame.style.marginTop = "20px";
+outputFrame.style.borderRadius = "20px";
+                            outputFrame.style.border = "8px solid #333";
+                            deviceBtns[0].classList.add("active");
+                        } else if (mode === "desktop") {
+
+
                             outputFrame.style.borderRadius = "20px";
                             outputFrame.style.border = "8px solid #333";
                             deviceBtns[0].classList.add("active");
                         } else if (mode === "desktop") {
-                            outputFrame.style.width = "100%";
+
+
+                            outputFrame.style.borderRadius = "20px";
+                            outputFrame.style.border = "8px solid #333";
+                            deviceBtns[0].classList.add("active");
+                        } else if (mode === "desktop") {
+
+
+                            outputFrame.style.borderRadius = "20px";
+                            outputFrame.style.border = "8px solid #333";
+                            deviceBtns[0].classList.add("active");
+                        } else if (mode === "desktop") {
+
+
+        hoverBox.style.transition = 'all 0.05s ease';
+        hoverBox.style.display = 'none';
+        document.documentElement.appendChild(hoverBox);
+
+        const selectBox = document.createElement('div');
+        selectBox.style.position = 'absolute';
+        selectBox.style.pointerEvents = 'none';
+        selectBox.style.outline = '3px solid #f59e0b';
+        selectBox.style.backgroundColor = 'rgba(245, 158, 11, 0.15)';
+        selectBox.style.zIndex = '999998';
+        selectBox.style.display = 'none';
+        document.documentElement.appendChild(selectBox);
+
+        const tempHoverBox = document.createElement('div');
+        tempHoverBox.style.position = 'absolute';
+        tempHoverBox.style.pointerEvents = 'none';
+        tempHoverBox.style.outline = '2px solid #10b981';
+        tempHoverBox.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+        tempHoverBox.style.zIndex = '999999';
+        tempHoverBox.style.display = 'none';
+        document.documentElement.appendChild(tempHoverBox);
+
+        function updateOverlay(el, overlayBox) {
+            if (!el) { overlayBox.style.display = 'none'; return; }
+            const rect = el.getBoundingClientRect();
+            overlayBox.style.top = (rect.top + window.scrollY) + 'px';
+            overlayBox.style.left = (rect.left + window.scrollX) + 'px';
+            overlayBox.style.width = rect.width + 'px';
+            overlayBox.style.height = rect.height + 'px';
+            overlayBox.style.display = 'block';
+        }
+
+
+                    function normalizeProjectFileValue(value) {
+                        if (typeof value === "string")
+                            return { content: value, encoding: "utf8" };
+                        if (
+                            value &&
+                            typeof value === "object" &&
+                            typeof value.content === "string"
+                        ) {
+                            return {
+                                content: value.content,
+                                encoding: value.encoding || "utf8",
+                            };
+                        }
+                        return { content: "", encoding: "utf8" };
+                    }                            outputFrame.style.width = "100%";
                             outputFrame.style.height = "100%";
                             outputFrame.style.marginTop = "0";
                             outputFrame.style.borderRadius = "0";
@@ -6917,10 +7025,25 @@ ${codeStore.js}
                                 status.textContent = "No matches found.";
                                 return;
                             }
-                            editor.focus();
+                            editor.focus({ preventScroll: true });
                             editor.setSelectionRange(index, index + query.length);
                             const before = source.slice(0, index);
-                            const line = before.split("\\n").length;
+                            const line = before.split("\n").length;
+                            // Scroll the match into view and keep the selection visibly highlighted.
+                            const computed = window.getComputedStyle(editor);
+                            const lineHeight = parseFloat(computed.lineHeight) || 24;
+                            const paddingTop = parseFloat(computed.paddingTop) || 0;
+                            const targetTop = Math.max(0, paddingTop + (line - 1) * lineHeight);
+                            const visibleTop = editor.scrollTop;
+                            const visibleBottom = visibleTop + editor.clientHeight - lineHeight;
+                            if (targetTop < visibleTop || targetTop > visibleBottom) {
+                                editor.scrollTop = Math.max(0, targetTop - (editor.clientHeight / 2) + lineHeight);
+                            }
+                            // Re-apply selection after scrolling so browsers repaint the highlight.
+                            requestAnimationFrame(() => {
+                                editor.focus({ preventScroll: true });
+                                editor.setSelectionRange(index, index + query.length);
+                            });
                             status.textContent = `Match at line ${line} · position ${index + 1}`;
                         };
 
