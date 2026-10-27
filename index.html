@@ -402,52 +402,9 @@
                         border-color: #3b82f6;
                     }
                     .dark-mode .reset-btn {
-                        background: linear-gradient(to right, #ef4444, #e11d48);
-                        border-color: #f87171;
-                        color: #ffffff;
-                    }
-
-.dark-mode .reset-btn:hover {
-                        background: linear-gradient(to right, #dc2626, #be123c);
-                    }
-
-.project-file-action-menu button {
-                        display: block;
-                        width: 100%;
-                        text-align: left;
-                        padding: 0.55rem 0.7rem;
-                        background: transparent;
-                        border: 0;
-                        color: #e5e7eb;
-                        border-radius: 0.4rem;
-                        font-size: 0.78rem;
-                        cursor: pointer;
-                    }
-
-.project-file-action-menu button:hover {
-                        background: #1f2937;
-                    }
-
-.download-menu button {
-                        width: 100%;
-                        border: 0;
-                        background: transparent;
-                        text-align: left;
-                        padding: 0.65rem 0.7rem;
-                        border-radius: 0.45rem;
-                        font-size: 0.78rem;
-                        font-weight: 700;
-                        color: #374151;
-                        cursor: pointer;
-                    }
-
-.dark-mode .download-menu button {
-                        color: #e5e7eb;
-                    }
-
-.download-menu button:hover {
-                        background: #dbeafe;
-                        color: #1d4ed8;
+                        background-color: #1f2937;
+                        border-color: #60a5fa;
+                        color: #f87171;
                     }
                     .dark-mode .reset-btn:hover {
                         background-color: #374151;
@@ -1234,7 +1191,7 @@
 
                                 <button
                                     onclick="clearCode();"
-                                    class="reset-btn px-4 py-2 bg-gradient-to-r from-red-500 to-rose-600 border border-red-400 text-white hover:from-red-600 hover:to-rose-700 hover:text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5"
+                                    class="reset-btn px-4 py-2 bg-white border border-blue-200 text-red-500 hover:bg-red-50 hover:text-red-600 text-sm font-medium rounded-lg shadow-sm transition"
                                     title="Reset Instantly"
                                 >
                                     <i class="fa-solid fa-trash mr-1"></i>
@@ -1964,7 +1921,7 @@ No element selected</pre
                                             class="flex bg-white border border-blue-100 rounded-lg p-1 gap-1 shadow-sm"
                                         >
                                             <button
-                                                onclick="setDevice('mobile')"
+                                                onclick="window.setDevice('mobile')"
                                                 class="device-btn px-2 py-1 rounded text-gray-500 hover:bg-blue-50 transition"
                                                 title="Mobile (375px)"
                                             >
@@ -1973,7 +1930,7 @@ No element selected</pre
                                                 ></i>
                                             </button>
                                             <button
-                                                onclick="setDevice('desktop')"
+                                                onclick="window.setDevice('desktop')"
                                                 class="device-btn active px-2 py-1 rounded text-gray-500 hover:bg-blue-50 transition"
                                                 title="Desktop (100%)"
                                             >
@@ -4942,93 +4899,55 @@ Return ONLY the complete fixed code for this layer. No conversational text, no e
 
                     // --- EDITOR FUNCTIONS ---
                     window.setDevice = function (mode) {
-                        deviceBtns.forEach((btn) =>
-                            btn.classList.remove("active")
-                        );
+                        // Keep the preview mode change independent from iframe reloads.
+                        const mobileButton = document.querySelector('.device-btn[title^="Mobile"]');
+                        const desktopButton = document.querySelector('.device-btn[title^="Desktop"]');
+                        const wrapper = outputFrame ? outputFrame.parentElement : null;
+                        if (!outputFrame || (mode !== "mobile" && mode !== "desktop")) return;
+
+                        deviceBtns.forEach((btn) => btn.classList.remove("active"));
 
                         if (mode === "mobile") {
-                            outputFrame.style.width = "375px";
-                            outputFrame.style.height = "667px";
+                            outputFrame.style.setProperty("width", "375px", "important");
+                            outputFrame.style.setProperty("height", "667px", "important");
+                            outputFrame.style.setProperty("max-width", "calc(100% - 16px)", "important");
+                            outputFrame.style.setProperty("max-height", "none", "important");
                             outputFrame.style.marginTop = "20px";
-outputFrame.style.borderRadius = "20px";
-                            outputFrame.style.border = "8px solid #333";
-                            deviceBtns[0].classList.add("active");
-                        } else if (mode === "desktop") {
-
-
+                            outputFrame.style.marginBottom = "20px";
+                            outputFrame.style.flex = "0 0 auto";
                             outputFrame.style.borderRadius = "20px";
                             outputFrame.style.border = "8px solid #333";
-                            deviceBtns[0].classList.add("active");
-                        } else if (mode === "desktop") {
-
-
-                            outputFrame.style.borderRadius = "20px";
-                            outputFrame.style.border = "8px solid #333";
-                            deviceBtns[0].classList.add("active");
-                        } else if (mode === "desktop") {
-
-
-                            outputFrame.style.borderRadius = "20px";
-                            outputFrame.style.border = "8px solid #333";
-                            deviceBtns[0].classList.add("active");
-                        } else if (mode === "desktop") {
-
-
-        hoverBox.style.transition = 'all 0.05s ease';
-        hoverBox.style.display = 'none';
-        document.documentElement.appendChild(hoverBox);
-
-        const selectBox = document.createElement('div');
-        selectBox.style.position = 'absolute';
-        selectBox.style.pointerEvents = 'none';
-        selectBox.style.outline = '3px solid #f59e0b';
-        selectBox.style.backgroundColor = 'rgba(245, 158, 11, 0.15)';
-        selectBox.style.zIndex = '999998';
-        selectBox.style.display = 'none';
-        document.documentElement.appendChild(selectBox);
-
-        const tempHoverBox = document.createElement('div');
-        tempHoverBox.style.position = 'absolute';
-        tempHoverBox.style.pointerEvents = 'none';
-        tempHoverBox.style.outline = '2px solid #10b981';
-        tempHoverBox.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
-        tempHoverBox.style.zIndex = '999999';
-        tempHoverBox.style.display = 'none';
-        document.documentElement.appendChild(tempHoverBox);
-
-        function updateOverlay(el, overlayBox) {
-            if (!el) { overlayBox.style.display = 'none'; return; }
-            const rect = el.getBoundingClientRect();
-            overlayBox.style.top = (rect.top + window.scrollY) + 'px';
-            overlayBox.style.left = (rect.left + window.scrollX) + 'px';
-            overlayBox.style.width = rect.width + 'px';
-            overlayBox.style.height = rect.height + 'px';
-            overlayBox.style.display = 'block';
-        }
-
-
-                    function normalizeProjectFileValue(value) {
-                        if (typeof value === "string")
-                            return { content: value, encoding: "utf8" };
-                        if (
-                            value &&
-                            typeof value === "object" &&
-                            typeof value.content === "string"
-                        ) {
-                            return {
-                                content: value.content,
-                                encoding: value.encoding || "utf8",
-                            };
-                        }
-                        return { content: "", encoding: "utf8" };
-                    }                            outputFrame.style.width = "100%";
-                            outputFrame.style.height = "100%";
+                            if (wrapper) {
+                                wrapper.style.justifyContent = "center";
+                                wrapper.style.alignItems = "flex-start";
+                            }
+                            if (mobileButton) mobileButton.classList.add("active");
+                        } else {
+                            outputFrame.style.setProperty("width", "100%", "important");
+                            outputFrame.style.setProperty("height", "100%", "important");
+                            outputFrame.style.setProperty("max-width", "100%", "important");
+                            outputFrame.style.setProperty("max-height", "100%", "important");
                             outputFrame.style.marginTop = "0";
+                            outputFrame.style.marginBottom = "0";
+                            outputFrame.style.flex = "1 1 auto";
                             outputFrame.style.borderRadius = "0";
                             outputFrame.style.border = "none";
-                            deviceBtns[1].classList.add("active");
+                            if (wrapper) {
+                                wrapper.style.justifyContent = "stretch";
+                                wrapper.style.alignItems = "stretch";
+                            }
+                            if (desktopButton) desktopButton.classList.add("active");
                         }
                     };
+
+                    // Bind directly as a fallback for hosted pages where inline handlers may be affected.
+                    deviceBtns.forEach((btn) => {
+                        const mode = btn.title && btn.title.startsWith("Mobile") ? "mobile" : "desktop";
+                        btn.addEventListener("click", (event) => {
+                            event.preventDefault();
+                            window.setDevice(mode);
+                        });
+                    });
 
                     window.openNewTab = function () {
                         const compiledHtml = getCompiledHTML(false);
