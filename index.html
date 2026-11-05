@@ -401,14 +401,14 @@
                         background-color: #3b82f6;
                         border-color: #3b82f6;
                     }
-               .dark-mode .reset-btn {
-    background-image: none !important;
-    background-color: #dc2626 !important;
-    border-color: #ef4444 !important;
-    color: #ffffff !important;
-}
+                    .dark-mode .reset-btn {
+                        background-image: none !important;
+                        background-color: #dc2626 !important;
+                        border-color: #ef4444 !important;
+                        color: #ffffff !important;
+                    }
                     .dark-mode .reset-btn:hover {
-                        background-color: #374151;
+                        background-color: #b91c1c !important;
                     }
 
                     /* Hidden console state */
@@ -5809,17 +5809,12 @@ ${codeStore.js}
 
                         const finalOutput = getCompiledHTML(true);
 
-                        if (currentBlobUrl) {
-                            URL.revokeObjectURL(currentBlobUrl);
-                            currentBlobUrl = null;
-                        }
+                        try {
+                            const doc = outputFrame.contentDocument || outputFrame.contentWindow.document;
+                            doc.open();
+                            doc.write(finalOutput);
+                            doc.close();
 
-                        const blob = new Blob([finalOutput], {
-                            type: "text/html;charset=utf-8",
-                        });
-                        currentBlobUrl = URL.createObjectURL(blob);
-
-                        outputFrame.onload = () => {
                             outputFrame.style.maxWidth = "100%";
                             outputFrame.style.maxHeight = "100%";
                             hijackConsole(outputFrame);
@@ -5832,9 +5827,32 @@ ${codeStore.js}
                                     "*"
                                 );
                             }
-                        };
-
-                        outputFrame.src = currentBlobUrl;
+                        } catch (err) {
+                            // Fallback if cross-origin or initial load restricts direct write
+                            if (currentBlobUrl) {
+                                URL.revokeObjectURL(currentBlobUrl);
+                                currentBlobUrl = null;
+                            }
+                            const blob = new Blob([finalOutput], {
+                                type: "text/html;charset=utf-8",
+                            });
+                            currentBlobUrl = URL.createObjectURL(blob);
+                            outputFrame.onload = () => {
+                                outputFrame.style.maxWidth = "100%";
+                                outputFrame.style.maxHeight = "100%";
+                                hijackConsole(outputFrame);
+                                if (isInspectActive && outputFrame.contentWindow) {
+                                    outputFrame.contentWindow.postMessage(
+                                        {
+                                            type: "DEV_EDTR_INSPECT_TOGGLE",
+                                            active: true,
+                                        },
+                                        "*"
+                                    );
+                                }
+                            };
+                            outputFrame.src = currentBlobUrl;
+                        }
                     }
 
                     // --- VISUAL ELEMENT PICKER TOGGLE ---
