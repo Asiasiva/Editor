@@ -1447,6 +1447,9 @@
                                         <button type="button" id="single-html-merge-open" class="single-mode-side-btn" title="Merge multiple complete HTML files">
                                             <i class="fa-solid fa-object-group"></i><span>Multi HTML Merge</span>
                                         </button>
+                                        <button type="button" id="single-module-builder-open" class="single-mode-side-btn" title="Build & merge 10 individual modules">
+                                            <i class="fa-solid fa-cubes"></i><span>Multi-Module Builder</span>
+                                        </button>
                                     </aside>
                                     <div id="line-numbers" class="line-numbers">
                                         1
@@ -3597,14 +3600,17 @@ No element selected</pre
                     // --- AI LAYER CONTEXT SWITCHER & DISPLAY ENGINE ---
 
                     function getLayerCodeSnippet(layerType) {
+                        const fallbackHtml =
+                            currentMode === "single"
+                                ? codeStore.single || htmlCode.value || ""
+                                : codeStore.html || "";
                         if (!selectedSourceState && layerType === "html")
-                            return codeStore.html || "";
+                            return fallbackHtml;
 
                         if (layerType === "html") {
                             return (
                                 selectedSourceState?.originalCode ||
-                                codeStore.html ||
-                                ""
+                                fallbackHtml
                             );
                         } else if (layerType === "css") {
                             if (
@@ -3765,31 +3771,48 @@ No element selected</pre
                         const cssSnippet = getLayerCodeSnippet("css");
                         const jsSnippet = getLayerCodeSnippet("js");
 
-                        const promptText = `You are an expert web developer assistant.
-The user wants to modify a webpage component.
+                        const hasSelectedElement = Boolean(
+                            selectedSourceState && selectedSourceState.range
+                        );
+                        const safeCssSnippet = cssSnippet.startsWith("/* No matching")
+                            ? ""
+                            : cssSnippet;
+                        const safeJsSnippet = jsSnippet.startsWith("// No matching")
+                            ? ""
+                            : jsSnippet;
 
-Selected Element Context: ${elementSelectorTag}
+                        const promptText = `You are an expert frontend developer assistant. The user may write instructions in natural Tamil, Tanglish (Tamil typed in English letters, e.g., "itha red colour ah maathu", "text konjam perusa aaku", "button click panna alert varanum"), or English. Understand their conversational intent accurately.
 
-Current HTML Code:
+Target Scope: ${
+                            hasSelectedElement
+                                ? `ONLY the single selected HTML element (${elementSelectorTag}) below. DO NOT alter any sibling, parent, or other elements on the page.`
+                                : "Whole document (no specific element was selected via Inspect)."
+                        }
+
+Selected HTML Snippet:
 ${htmlSnippet}
 
-Current CSS Code:
-${cssSnippet}
+Related CSS Snippet:
+${safeCssSnippet || "(none)"}
 
-Current JavaScript Code:
-${jsSnippet}
+Related JavaScript Snippet:
+${safeJsSnippet || "(none)"}
 
-User Instruction:
+User Instruction (Tamil / Tanglish / English):
 ${instruction}
 
-Task: Modify HTML, CSS, and JS according to user instructions. Return ONLY a valid JSON object matching this structure:
-{
-  "html": "updated html block or exact original if unchanged",
-  "css": "updated css rules or exact original if unchanged",
-  "js": "updated javascript snippet or exact original if unchanged"
-}
+CRITICAL RULES TO PREVENT UNINTENDED SIDE EFFECTS:
+1. ONLY modify the exact selected HTML snippet above. Never alter or delete other elements.
+2. If changing styles (color, size, spacing, font, border, etc.) on a selected element that uses shared classes (like Bootstrap '.btn', '.card', etc.), DO NOT modify the shared class CSS rule because that would change all other elements! Instead, either apply inline styles directly on the selected HTML element or add a unique class/id for this specific element only.
+3. If CSS does not need changes, return "" (empty string) for "css". If JS does not need changes, return "" (empty string) for "js". NEVER return placeholder comments.
+4. Preserve all existing working logic, attributes, and IDs unless explicitly asked to change them.
 
-DO NOT include markdown syntax around JSON if possible, no markdown backticks, no explanations. Just valid raw JSON.`;
+Return ONLY a valid JSON object matching this exact structure (no markdown fences, no extra text):
+{
+  "html": "updated HTML snippet (or exact original HTML snippet if unchanged)",
+  "css": "new or updated CSS rule ONLY if CSS must change, otherwise empty string",
+  "js": "new or updated JS code ONLY if JS must change, otherwise empty string"
+}`;
 
                         isAiProcessing = true;
                         const fixBtn = document.getElementById("ai-fix-btn");
@@ -3882,8 +3905,12 @@ DO NOT include markdown syntax around JSON if possible, no markdown backticks, n
                             generatedJs,
                         } = pendingAiReplacement;
 
-                        // 1. Apply HTML Changes
-                        if (generatedHtml) {
+                        const cleanHtmlOut = (generatedHtml || "").trim();
+                        const cleanCssOut = (generatedCss || "").trim();
+                        const cleanJsOut = (generatedJs || "").trim();
+
+                        // 1. Apply HTML Changes ONLY to the exact selected range
+                        if (cleanHtmlOut) {
                             if (currentMode === "multi") {
                                 if (snapshot && snapshot.range) {
                                     const currentHtml = codeStore.html;
@@ -3895,9 +3922,9 @@ DO NOT include markdown syntax around JSON if possible, no markdown backticks, n
                                         snapshot.range.end
                                     );
                                     codeStore.html =
-                                        before + generatedHtml + after;
+                                        before + cleanHtmlOut + after;
                                 } else {
-                                    codeStore.html = generatedHtml;
+                                    codeStore.html = cleanHtmlOut;
                                 }
                             } else {
                                 if (snapshot && snapshot.range) {
@@ -3911,82 +3938,55 @@ DO NOT include markdown syntax around JSON if possible, no markdown backticks, n
                                         snapshot.range.end
                                     );
                                     codeStore.single =
-                                        before + generatedHtml + after;
+                                        before + cleanHtmlOut + after;
+                                } else {
+                                    codeStore.single = cleanHtmlOut;
                                 }
                             }
                         }
 
-                        // 2. Apply CSS Changes
-                        if (generatedCss) {
+                        // 2. Apply CSS Changes safely (append scoped rules instead of overwriting shared selectors)
+                        if (
+                            cleanCssOut &&
+                            !cleanCssOut.startsWith("/* No matching")
+                        ) {
                             if (currentMode === "multi") {
-                                if (
-                                    elementState &&
-                                    elementState.cssMatches &&
-                                    elementState.cssMatches.length > 0
-                                ) {
-                                    const targetRange =
-                                        elementState.cssMatches[0];
-                                    const currentCss = codeStore.css;
-                                    const before = currentCss.slice(
-                                        0,
-                                        targetRange.start
-                                    );
-                                    const after = currentCss.slice(
-                                        targetRange.end
-                                    );
-                                    codeStore.css =
-                                        before + generatedCss + after;
-                                } else {
-                                    codeStore.css += `\n\n${generatedCss}`;
-                                }
+                                codeStore.css = (codeStore.css || "").trim()
+                                    ? codeStore.css + "\n\n" + cleanCssOut
+                                    : cleanCssOut;
                             } else {
                                 const currentSingle =
                                     codeStore.single || htmlCode.value;
-                                if (
-                                    elementState &&
-                                    elementState.cssMatches &&
-                                    elementState.cssMatches.length > 0
-                                ) {
-                                    const targetRange =
-                                        elementState.cssMatches[0];
-                                    const before = currentSingle.slice(
-                                        0,
-                                        targetRange.start
-                                    );
-                                    const after = currentSingle.slice(
-                                        targetRange.end
-                                    );
+                                if (currentSingle.includes("</style>")) {
                                     codeStore.single =
-                                        before + generatedCss + after;
+                                        currentSingle.replace(
+                                            "</style>",
+                                            `${cleanCssOut}\n</style>`
+                                        );
+                                } else if (
+                                    currentSingle.includes("</head>")
+                                ) {
+                                    codeStore.single =
+                                        currentSingle.replace(
+                                            "</head>",
+                                            `<style>\n${cleanCssOut}\n</style>\n</head>`
+                                        );
                                 } else {
-                                    if (currentSingle.includes("</style>")) {
-                                        codeStore.single =
-                                            currentSingle.replace(
-                                                "</style>",
-                                                `${generatedCss}\n</style>`
-                                            );
-                                    } else if (
-                                        currentSingle.includes("</head>")
-                                    ) {
-                                        codeStore.single =
-                                            currentSingle.replace(
-                                                "</head>",
-                                                `<style>\n${generatedCss}\n</style>\n</head>`
-                                            );
-                                    } else {
-                                        codeStore.single += `\n<style>\n${generatedCss}\n</style>`;
-                                    }
+                                    codeStore.single += `\n<style>\n${cleanCssOut}\n</style>`;
                                 }
                             }
                         }
 
-                        // 3. Apply JS Changes
-                        if (generatedJs) {
+                        // 3. Apply JS Changes safely
+                        if (
+                            cleanJsOut &&
+                            !cleanJsOut.startsWith("// No matching")
+                        ) {
                             if (currentMode === "multi") {
                                 if (
                                     elementState &&
                                     elementState.jsMatches &&
-                                    elementState.jsMatches.length > 0
+                                    elementState.jsMatches.length === 1
                                 ) {
                                     const targetRange =
                                         elementState.jsMatches[0];
@@ -4010,56 +4010,23 @@ DO NOT include markdown syntax around JSON if possible, no markdown backticks, n
                                         blockRange.start
                                     );
                                     const after = jsSrc.slice(blockRange.end);
-                                    codeStore.js = before + generatedJs + after;
+                                    codeStore.js = before + cleanJsOut + after;
                                 } else {
-                                    codeStore.js += `\n\n${generatedJs}`;
+                                    codeStore.js = (codeStore.js || "").trim()
+                                        ? codeStore.js + "\n\n" + cleanJsOut
+                                        : cleanJsOut;
                                 }
                             } else {
                                 const currentSingle =
                                     codeStore.single || htmlCode.value;
-                                if (
-                                    elementState &&
-                                    elementState.jsMatches &&
-                                    elementState.jsMatches.length > 0
-                                ) {
-                                    const targetRange =
-                                        elementState.jsMatches[0];
-                                    const lines = currentSingle.split("\n");
-                                    const lineIdx = lines.findIndex((l) =>
-                                        l.includes(
-                                            targetRange.label.split(" ")[0]
-                                        )
-                                    );
-                                    const blockRange =
-                                        lineIdx !== -1
-                                            ? findJsBlockRange(
-                                                  currentSingle,
-                                                  lineIdx
-                                              )
-                                            : {
-                                                  start: targetRange.start,
-                                                  end: targetRange.end,
-                                              };
-
-                                    const before = currentSingle.slice(
-                                        0,
-                                        blockRange.start
-                                    );
-                                    const after = currentSingle.slice(
-                                        blockRange.end
-                                    );
+                                if (currentSingle.includes("</body>")) {
                                     codeStore.single =
-                                        before + generatedJs + after;
+                                        currentSingle.replace(
+                                            "</body>",
+                                            `<script>\n${cleanJsOut}\n<\/script>\n</body>`
+                                        );
                                 } else {
-                                    if (currentSingle.includes("</body>")) {
-                                        codeStore.single =
-                                            currentSingle.replace(
-                                                "</body>",
-                                                `<script>\n${generatedJs}\n<\/script>\n</body>`
-                                            );
-                                    } else {
-                                        codeStore.single += `\n<script>\n${generatedJs}\n<\/script>`;
-                                    }
+                                    codeStore.single += `\n<script>\n${cleanJsOut}\n<\/script>`;
                                 }
                             }
                         }
@@ -7189,8 +7156,6 @@ ${codeStore.js}
     
 <!-- DEV_EDTR_MULTI_MODULE_BUILDER_V1 -->
 <style id="dev-edtr-module-builder-style">
-#dev-module-launch{position:fixed;right:18px;bottom:22px;z-index:10080;background:#0f766e;color:#fff;border:0;border-radius:999px;padding:12px 18px;font:700 13px system-ui;box-shadow:0 8px 24px #0f172a33;cursor:pointer}
-#dev-module-launch:hover{background:#115e59;transform:translateY(-1px)}
 #dev-module-overlay{position:fixed;inset:0;z-index:10090;background:#0b1220cc;display:none;align-items:center;justify-content:center;padding:14px}
 #dev-module-overlay.open{display:flex}
 #dev-module-panel{width:min(1180px,98vw);height:min(850px,94vh);background:#f8fafc;color:#0f172a;border-radius:16px;box-shadow:0 24px 80px #0008;display:flex;flex-direction:column;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -7245,9 +7210,14 @@ function loadModules(){
 function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(modules));}catch(e){setStatus("Browser storage is full. Download your work to keep a copy.",true);}}
 function el(tag,attrs,txt){var n=document.createElement(tag);Object.keys(attrs||{}).forEach(function(k){if(k==="class")n.className=attrs[k];else n.setAttribute(k,attrs[k]);});if(txt!==undefined)n.textContent=txt;return n;}
 function buildUI(){
- var launch=el("button",{id:"dev-module-launch",type:"button"},"▦  Multi-Module Builder");
- launch.addEventListener("click",open);
- document.body.appendChild(launch);
+ var sideLaunch=document.getElementById("single-module-builder-open");
+ if(sideLaunch){
+  sideLaunch.addEventListener("click",function(){
+   document.querySelectorAll(".single-mode-side-btn").forEach(function(b){b.classList.remove("active");});
+   sideLaunch.classList.add("active");
+   open();
+  });
+ }
  var overlay=el("div",{id:"dev-module-overlay","aria-hidden":"true"});
  var panel=el("section",{id:"dev-module-panel","aria-label":"Multi-Module Builder"});
  var head=el("div",{id:"dev-module-head"});
@@ -7304,7 +7274,7 @@ function buildUI(){
  renderList();renderEditor();
 }
 function open(){var o=document.getElementById("dev-module-overlay");if(o){o.classList.add("open");o.setAttribute("aria-hidden","false");renderList();renderEditor();compileModules();}}
-function closePanel(){var o=document.getElementById("dev-module-overlay");if(o){o.classList.remove("open");o.setAttribute("aria-hidden","true");}}
+function closePanel(){var o=document.getElementById("dev-module-overlay");if(o){o.classList.remove("open");o.setAttribute("aria-hidden","true");}document.querySelectorAll(".single-mode-side-btn").forEach(function(b){b.classList.remove("active");});var edBtn=document.getElementById("single-sidebar-editor");if(edBtn)edBtn.classList.add("active");}
 function setStatus(msg,bad){var n=document.getElementById("dev-module-status");if(n)n.textContent=msg;if(n)n.style.color=bad?"#b91c1c":"";}
 function renderList(){
  var list=document.getElementById("dev-module-list");if(!list)return;list.innerHTML="";
@@ -7579,11 +7549,15 @@ body.dark-mode #single-html-merge-dialog{background:#111827;color:#e5e7eb}body.d
   return html;
  }
  function open(){modal.classList.add('open');modal.setAttribute('aria-hidden','false');if(!list.children.length){addInput();addInput();}}
- function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');}
- document.getElementById('single-html-merge-open').addEventListener('click',function(){document.getElementById('single-sidebar-editor').classList.remove('active');document.getElementById('single-html-merge-open').classList.add('active');open();});
+ function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.querySelectorAll('.single-mode-side-btn').forEach(function(b){b.classList.remove('active');});var edBtn=document.getElementById('single-sidebar-editor');if(edBtn)edBtn.classList.add('active');}
+ document.getElementById('single-html-merge-open').addEventListener('click',function(){
+  document.querySelectorAll('.single-mode-side-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('single-html-merge-open').classList.add('active');
+  open();
+ });
  document.getElementById('single-sidebar-editor').addEventListener('click',function(){
+  document.querySelectorAll('.single-mode-side-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('single-sidebar-editor').classList.add('active');
-  document.getElementById('single-html-merge-open').classList.remove('active');
   var editor=document.getElementById('html-code');if(editor)editor.focus();
  });
  document.getElementById('single-html-merge-close').addEventListener('click',close);
