@@ -1357,7 +1357,7 @@
                             <div
                                 id="project-files-backdrop"
                                 class="project-files-backdrop"
-                                onclick="closeProjectFiles();"
+                                onclick="closeProjectFiles(); closeSingleModeSidebar();"
                             ></div>
 
                             <!-- 1. HTML/CSS/JS Editor Panel -->
@@ -1409,18 +1409,41 @@
                                     <!-- Single Mode Tab Header -->
                                     <div
                                         id="single-tabs"
-                                        class="hidden flex items-center gap-1"
+                                        class="hidden flex items-center gap-1 overflow-x-auto max-w-[calc(100%-110px)] py-0.5"
                                     >
                                         <button
+                                            type="button"
                                             id="tab-single"
                                             class="editor-tab-btn active"
+                                            title="Single HTML Editor"
                                         >
                                             <i
                                                 class="fa-solid fa-code text-blue-400 text-sm"
                                             ></i>
                                             index.html
                                         </button>
-
+                                        <button
+                                            type="button"
+                                            id="single-html-merge-open"
+                                            class="editor-tab-btn"
+                                            title="Merge multiple complete HTML files"
+                                        >
+                                            <i
+                                                class="fa-solid fa-object-group text-emerald-400 text-sm"
+                                            ></i>
+                                            Multi HTML Merge
+                                        </button>
+                                        <button
+                                            type="button"
+                                            id="single-module-builder-open"
+                                            class="editor-tab-btn"
+                                            title="Build & merge 10 individual modules"
+                                        >
+                                            <i
+                                                class="fa-solid fa-cubes text-purple-400 text-sm"
+                                            ></i>
+                                            Multi-Module Builder
+                                        </button>
                                     </div>
 
                                     <!-- Character Count Badge -->
@@ -1439,18 +1462,6 @@
                                 <div
                                     class="editor-container flex-1 overflow-hidden"
                                 >
-                                    <aside id="single-mode-sidebar" class="single-mode-sidebar" aria-label="Single HTML tools">
-                                        <div class="single-mode-sidebar-title">SINGLE MODE</div>
-                                        <button type="button" id="single-sidebar-editor" class="single-mode-side-btn active" title="Open Single HTML Editor">
-                                            <i class="fa-solid fa-code"></i><span>index.html</span>
-                                        </button>
-                                        <button type="button" id="single-html-merge-open" class="single-mode-side-btn" title="Merge multiple complete HTML files">
-                                            <i class="fa-solid fa-object-group"></i><span>Multi HTML Merge</span>
-                                        </button>
-                                        <button type="button" id="single-module-builder-open" class="single-mode-side-btn" title="Build & merge 10 individual modules">
-                                            <i class="fa-solid fa-cubes"></i><span>Multi-Module Builder</span>
-                                        </button>
-                                    </aside>
                                     <div id="line-numbers" class="line-numbers">
                                         1
                                     </div>
@@ -2848,6 +2859,8 @@ No element selected</pre
                         document.body.classList.remove("project-files-open");
                         closeProjectFileActionMenu();
                     }
+
+                    function closeSingleModeSidebar() {}
 
                     function toggleTopProjectFiles(event) {
                         event?.stopPropagation();
@@ -4353,6 +4366,7 @@ Return ONLY the complete fixed code for this layer. No conversational text, no e
                         }
 
                         currentMode = mode;
+                        closeSingleModeSidebar();
                         document.body.classList.toggle("single-mode-active", mode === "single");
                         const multiBtn =
                             document.getElementById("mode-btn-multi");
@@ -7132,6 +7146,7 @@ ${codeStore.js}
                         document.addEventListener("keydown", (event) => {
                             if (event.key === "Escape") {
                                 closeProjectFiles();
+                                closeSingleModeSidebar();
                                 closeProjectFileActionMenu();
                                 closeDownloadMenu();
                             }
@@ -7213,7 +7228,7 @@ function buildUI(){
  var sideLaunch=document.getElementById("single-module-builder-open");
  if(sideLaunch){
   sideLaunch.addEventListener("click",function(){
-   document.querySelectorAll(".single-mode-side-btn").forEach(function(b){b.classList.remove("active");});
+   document.querySelectorAll("#single-tabs .editor-tab-btn").forEach(function(b){b.classList.remove("active");});
    sideLaunch.classList.add("active");
    open();
   });
@@ -7274,7 +7289,7 @@ function buildUI(){
  renderList();renderEditor();
 }
 function open(){var o=document.getElementById("dev-module-overlay");if(o){o.classList.add("open");o.setAttribute("aria-hidden","false");renderList();renderEditor();compileModules();}}
-function closePanel(){var o=document.getElementById("dev-module-overlay");if(o){o.classList.remove("open");o.setAttribute("aria-hidden","true");}document.querySelectorAll(".single-mode-side-btn").forEach(function(b){b.classList.remove("active");});var edBtn=document.getElementById("single-sidebar-editor");if(edBtn)edBtn.classList.add("active");}
+function closePanel(){var o=document.getElementById("dev-module-overlay");if(o){o.classList.remove("open");o.setAttribute("aria-hidden","true");}document.querySelectorAll("#single-tabs .editor-tab-btn").forEach(function(b){b.classList.remove("active");});var edBtn=document.getElementById("tab-single");if(edBtn)edBtn.classList.add("active");}
 function setStatus(msg,bad){var n=document.getElementById("dev-module-status");if(n)n.textContent=msg;if(n)n.style.color=bad?"#b91c1c":"";}
 function renderList(){
  var list=document.getElementById("dev-module-list");if(!list)return;list.innerHTML="";
@@ -7349,17 +7364,21 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 #single-html-merge-output-wrap{padding:10px;border-top:1px solid #cbd5e1;display:flex;flex-direction:column;gap:6px;min-height:180px;flex:1}
 #single-html-merge-output{width:100%;flex:1;min-height:130px;resize:vertical;border:1px solid #cbd5e1;border-radius:8px;padding:9px;font:11px/1.5 ui-monospace,monospace;color:#111827;background:#f8fafc}
 #single-html-merge-status{font-size:11px;color:#475569;white-space:pre-wrap}
-/* Single-mode vertical tool sidebar; multi-mode editor layout remains unchanged. */
-.single-mode-sidebar{display:none;flex:0 0 148px;flex-direction:column;gap:7px;padding:10px 7px;background:#111827;border-right:1px solid #374151;color:#e5e7eb;overflow-y:auto}
-body.single-mode-active .single-mode-sidebar{display:flex}
-.single-mode-sidebar-title{font-size:9px;font-weight:900;letter-spacing:1.1px;color:#94a3b8;padding:3px 7px 7px}
-.single-mode-side-btn{display:flex;align-items:center;gap:9px;width:100%;min-height:39px;padding:8px 9px;border:1px solid transparent;border-radius:7px;background:transparent;color:#cbd5e1;text-align:left;font-size:11px;font-weight:750;cursor:pointer}
-.single-mode-side-btn i{width:15px;text-align:center;font-size:13px}
-.single-mode-side-btn:hover{background:#1f2937;color:#fff}
-.single-mode-side-btn.active{background:#1d4ed8;color:#fff;border-color:#3b82f6}
+/* Single-mode collapsible drawer sidebar (matches Multi-Mode clean full-width editor + top-left ≡ toggle) */
+.single-mode-sidebar{display:none;position:fixed;z-index:10035;top:10px;left:10px;bottom:10px;width:240px;max-width:82vw;flex-direction:column;gap:8px;padding:58px 12px 14px;background:var(--header-bg);border:1px solid var(--border-color);border-radius:0.75rem;box-shadow:0 20px 45px rgba(0,0,0,0.28);color:#1f2937;overflow-y:auto}
+body.single-mode-active .single-mode-sidebar.sm-drawer-open{display:flex;animation:pf-slide-in 0.18s ease}
+.single-mode-sidebar-title{font-size:11px;font-weight:800;letter-spacing:0.8px;color:#2563eb;text-transform:uppercase;padding:0 6px 6px;border-bottom:1px solid var(--border-color);margin-bottom:2px}
+.single-mode-side-btn{display:flex;align-items:center;gap:10px;width:100%;min-height:42px;padding:9px 11px;border:1px solid transparent;border-radius:0.55rem;background:transparent;color:#374151;text-align:left;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s ease}
+.single-mode-side-btn i{width:16px;text-align:center;font-size:14px}
+.single-mode-side-btn:hover{background:#dbeafe;color:#1d4ed8}
+.single-mode-side-btn.active{background:#2563eb;color:#ffffff;box-shadow:0 2px 8px rgba(37,99,235,0.3)}
 #single-html-merge-preview{background:#7c3aed;color:#fff}
-body.dark-mode .single-mode-sidebar{background:#0b1220;border-color:#374151}
-@media(max-width:700px){.single-mode-sidebar{flex-basis:112px;padding:8px 5px}.single-mode-side-btn{font-size:10px;padding:7px 5px;gap:5px}.single-mode-sidebar-title{font-size:8px}}
+body.dark-mode .single-mode-sidebar{background:#1f2937;border-color:#374151;color:#e5e7eb}
+body.dark-mode .single-mode-sidebar-title{color:#93c5fd;border-color:#374151}
+body.dark-mode .single-mode-side-btn{color:#d1d5db}
+body.dark-mode .single-mode-side-btn:hover{background:#1f3b63;color:#93c5fd}
+body.dark-mode .single-mode-side-btn.active{background:#2563eb;color:#ffffff}
+@media(max-width:767px){.single-mode-sidebar{top:0;left:0;bottom:0;border-radius:0 0.8rem 0.8rem 0;padding-top:56px}}
 body.dark-mode #single-html-merge-dialog{background:#111827;color:#e5e7eb}body.dark-mode #single-html-merge-list{background:#111827}body.dark-mode .single-html-merge-item{border-color:#374151}body.dark-mode .single-html-merge-item label{background:#1f2937;color:#e5e7eb}body.dark-mode .single-html-merge-item textarea,body.dark-mode #single-html-merge-output{background:#0f172a;color:#e5e7eb;border-color:#374151}
 @media(max-width:700px){#single-html-merge-list{grid-template-columns:1fr}#single-html-merge-dialog{height:96vh}#single-html-merge-output-wrap{min-height:160px}}
 </style>
@@ -7549,15 +7568,15 @@ body.dark-mode #single-html-merge-dialog{background:#111827;color:#e5e7eb}body.d
   return html;
  }
  function open(){modal.classList.add('open');modal.setAttribute('aria-hidden','false');if(!list.children.length){addInput();addInput();}}
- function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.querySelectorAll('.single-mode-side-btn').forEach(function(b){b.classList.remove('active');});var edBtn=document.getElementById('single-sidebar-editor');if(edBtn)edBtn.classList.add('active');}
+ function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.querySelectorAll('#single-tabs .editor-tab-btn').forEach(function(b){b.classList.remove('active');});var edBtn=document.getElementById('tab-single');if(edBtn)edBtn.classList.add('active');}
  document.getElementById('single-html-merge-open').addEventListener('click',function(){
-  document.querySelectorAll('.single-mode-side-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('#single-tabs .editor-tab-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('single-html-merge-open').classList.add('active');
   open();
  });
- document.getElementById('single-sidebar-editor').addEventListener('click',function(){
-  document.querySelectorAll('.single-mode-side-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('single-sidebar-editor').classList.add('active');
+ document.getElementById('tab-single').addEventListener('click',function(){
+  document.querySelectorAll('#single-tabs .editor-tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('tab-single').classList.add('active');
   var editor=document.getElementById('html-code');if(editor)editor.focus();
  });
  document.getElementById('single-html-merge-close').addEventListener('click',close);
