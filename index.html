@@ -1266,7 +1266,15 @@
                                             <i
                                                 class="fa-solid fa-file-code mr-2"
                                             ></i
-                                            >Single HTML
+                                            >Single HTML (Save As)
+                                        </button>
+                                        <button
+                                            onclick="downloadCodeNewTab(); closeDownloadMenu();"
+                                        >
+                                            <i
+                                                class="fa-solid fa-arrow-up-right-from-square mr-2"
+                                            ></i
+                                            >Single HTML (New Tab-ல் Save)
                                         </button>
                                         <button
                                             onclick="downloadProjectZip(); closeDownloadMenu();"
@@ -2821,13 +2829,25 @@ No element selected</pre
                         return new Blob([arr], { type: mime });
                     }
 
-                    function triggerBrowserDownload(blob, filename) {
+                    async function triggerBrowserDownload(blob, filename) {
+                        const safeName = sanitizeProjectPath(filename).split("/").pop() || "download";
+                        if (window.showSaveFilePicker) {
+                            try {
+                                const isZip = safeName.toLowerCase().endsWith(".zip");
+                                const handle = await window.showSaveFilePicker({ suggestedName: safeName, types: [{ description: isZip ? "ZIP File" : "File", accept: isZip ? { "application/zip": [".zip"] } : { "text/plain": [".txt", ".html", ".css", ".js"] } }] });
+                                const writable = await handle.createWritable();
+                                await writable.write(await blob.arrayBuffer());
+                                await writable.close();
+                                showToast("Saved! Zone mark இல்லை, Block வராது.");
+                                return;
+                            } catch (e) {
+                                if (e && e.name === "AbortError") return;
+                            }
+                        }
                         const a = document.createElement("a");
                         const url = URL.createObjectURL(blob);
                         a.href = url;
-                        a.download =
-                            sanitizeProjectPath(filename).split("/").pop() ||
-                            "download";
+                        a.download = safeName;
                         document.body.appendChild(a);
                         a.click();
                         a.remove();
@@ -6368,18 +6388,36 @@ ${codeStore.js}
                         }, DEBOUNCE_DELAY);
                     }
 
-                    window.downloadCode = function () {
+                    window.downloadCode = async function () {
                         const compiledHtml = getCompiledHTML(false);
-                        const blob = new Blob([compiledHtml], {
-                            type: "text/html",
-                        });
-                        const a = document.createElement("a");
-                        a.href = URL.createObjectURL(blob);
-                        a.download = "index.html";
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        showToast("பதிவிறக்கம் ஆகிறது...");
+                        if (window.showSaveFilePicker) {
+                            try {
+                                const handle = await window.showSaveFilePicker({ suggestedName: "index.html", types: [{ description: "HTML File", accept: { "text/html": [".html"] } }] });
+                                const writable = await handle.createWritable();
+                                await writable.write(compiledHtml);
+                                await writable.close();
+                                showToast("Saved! நேரடியா save ஆச்சு, Zone mark இல்லை, Block வராது.");
+                                return;
+                            } catch (e) {
+                                if (e && e.name === "AbortError") { showToast("Save cancel பண்ணிட்டீங்க."); return; }
+                                showToast("Save As open ஆகலை (" + (e && e.name ? e.name : "blocked") + "). New Tab-ல் திறக்குறேன், அங்கே Ctrl+S பண்ணுங்க.");
+                            }
+                        } else {
+                            showToast("உங்க browser-ல Save As இல்லை. New Tab-ல் திறக்குறேன், அங்கே Ctrl+S பண்ணுங்க.");
+                        }
+                        const blob = new Blob([compiledHtml], { type: "text/html" });
+                        const url = URL.createObjectURL(blob);
+                        const w = window.open(url, "_blank");
+                        if (!w) { showToast("Popup block ஆச்சு. Popup allow பண்ணிட்டு மறுபடியும் try பண்ணுங்க.", true); return; }
+                        showToast("New Tab-ல் open ஆச்சு. அங்கே Ctrl+S > Save பண்ணுங்க. அதுக்கு Block வராது.");
+                    };
+                    window.downloadCodeNewTab = function () {
+                        const compiledHtml = getCompiledHTML(false);
+                        const blob = new Blob([compiledHtml], { type: "text/html" });
+                        const url = URL.createObjectURL(blob);
+                        const w = window.open(url, "_blank");
+                        if (!w) { showToast("Popup block ஆச்சு. Popup allow பண்ணுங்க.", true); return; }
+                        showToast("New Tab-ல் open ஆச்சு. அங்கே Ctrl+S > Save பண்ணுங்க. அதுக்கு Block வராது.");
                     };
 
                     window.clearCode = function () {
@@ -7213,10 +7251,11 @@ body.dark-mode #single-html-merge-dialog{background:#111827;color:#e5e7eb}body.d
    <button type="button" id="single-html-merge-add" style="background:#dbeafe;color:#1d4ed8">＋ Add HTML</button>
    <button type="button" id="single-html-merge-run" style="background:#0f766e;color:white">Merge &amp; Generate</button>
    <button type="button" id="single-html-merge-copy" style="background:#334155;color:white">Copy Output</button>
-   <button type="button" id="single-html-merge-download" style="background:#2563eb;color:white">Download HTML</button>
+   <button type="button" id="single-html-merge-download" style="background:#2563eb;color:white">Download HTML (Save As)</button>
+   <button type="button" id="single-html-merge-save-newtab" style="background:#7c3aed;color:white" title="New Tab-ல் திறந்து Ctrl+S-ல் Save பண்ணு">New Tab</button>
    <button type="button" id="single-html-merge-preview" title="Load merged HTML into the editor and refresh the main preview">Load to Editor + Preview</button>
   </div>
-  <div style="padding:7px 10px;background:#fffbeb;border-bottom:1px solid #fde68a;font-size:11px;color:#92400e">Download பண்ணினா <b>Save As</b> dialog வரும் — அதுல save பண்ணின file-க்கு Windows Block வராது. ஒவ்வொரு box-க்கும் <b>1 file மட்டும்</b>, <b>Sidebar பேர்</b> கொடுங்க, <b>Default</b> tick பண்ணின tool முதலில் திறக்கும்.</div>
+  <div style="padding:7px 10px;background:#fffbeb;border-bottom:1px solid #fde68a;font-size:11px;color:#92400e"></div>
   <div id="single-html-merge-list"></div>
   <div id="single-html-merge-output-wrap"><strong style="font-size:12px">Merged Single HTML Output</strong><textarea id="single-html-merge-output" spellcheck="false" placeholder="Merged HTML output will appear here..."></textarea><div id="single-html-merge-status" aria-live="polite">Add HTML documents, paste each complete file, then click Merge &amp; Generate.</div></div>
  </section>
@@ -7426,14 +7465,17 @@ body.dark-mode #single-html-merge-dialog{background:#111827;color:#e5e7eb}body.d
   var allStyles=[
    'html,body{margin:0;padding:0;min-height:100%;}',
    '#dev-single-merge-app{display:flex;min-height:100vh;align-items:stretch;}',
-   '#dev-single-merge-nav{position:sticky;top:0;height:100vh;width:240px;flex:0 0 240px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:14px 12px;background:#0f172a;color:#fff;border-right:1px solid #334155;font-family:system-ui,-apple-system,sans-serif;z-index:1050;}',
+   '#dsm-toggle{position:fixed;top:10px;left:10px;z-index:1300;background:#0f172a;color:#fff;border:1px solid #334155;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25);font-family:system-ui,-apple-system,sans-serif;}',
+   '#dsm-toggle:hover{background:#1e293b;}',
+   '#dev-single-merge-app.dsm-nav-hidden #dev-single-merge-nav{display:none !important;}',
+   '#dev-single-merge-nav{position:sticky;top:0;height:100vh;width:240px;flex:0 0 240px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:50px 12px 14px;background:#0f172a;color:#fff;border-right:1px solid #334155;font-family:system-ui,-apple-system,sans-serif;z-index:1050;}',
    '#dev-single-merge-nav .dsm-brand{font-size:15px;font-weight:800;padding:4px 6px 10px;border-bottom:1px solid #334155;margin-bottom:6px;}',
    '#dev-single-merge-nav .dsm-brand small{display:block;font-size:11px;font-weight:400;color:#94a3b8;margin-top:2px;}',
    '#dev-single-merge-nav .dsm-tab{display:block;width:100%;text-align:left;border:1px solid #334155;background:#1e293b;color:#cbd5e1;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}',
    '#dev-single-merge-nav .dsm-tab:hover{background:#334155;color:#fff;}',
    '#dev-single-merge-nav .dsm-tab.active{background:#2563eb;border-color:#60a5fa;color:#fff;box-shadow:0 4px 14px #2563eb55;}',
    '#dev-single-merge-main{flex:1;min-width:0;}',
-   '@media(max-width:760px){#dev-single-merge-app{flex-direction:column;}#dev-single-merge-nav{position:sticky;top:0;height:auto;width:auto;flex:none;flex-direction:row;overflow-x:auto;padding:8px 10px;border-right:0;border-bottom:1px solid #334155;}#dev-single-merge-nav .dsm-brand{display:none;}#dev-single-merge-nav .dsm-tab{flex:0 0 auto;width:auto;white-space:nowrap;padding:8px 12px;}}'
+   '@media(max-width:760px){#dev-single-merge-app{flex-direction:column;}#dev-single-merge-nav{position:sticky;top:0;height:auto;width:auto;flex:none;flex-direction:row;overflow-x:auto;padding:50px 10px 8px;border-right:0;border-bottom:1px solid #334155;}#dev-single-merge-nav .dsm-brand{display:none;}#dev-single-merge-nav .dsm-tab{flex:0 0 auto;width:auto;white-space:nowrap;padding:8px 12px;}}'
   ];
   docs.forEach(function(d){allStyles=allStyles.concat(d.styles);});
   allStyles.push('[data-single-merge-doc]{display:none !important;min-height:100vh;}','[data-single-merge-doc].dsm-active{display:block !important;}');
@@ -7468,11 +7510,11 @@ body.dark-mode #single-html-merge-dialog{background:#111827;color:#e5e7eb}body.d
     }
    });
   });
-  var navLogic='var slugMap='+JSON.stringify(slugMap)+';\nfunction showDsmModule(idx){\nvar sections=document.querySelectorAll(\'[data-single-merge-doc]\');\nvar tabs=document.querySelectorAll(\'#dev-single-merge-nav .dsm-tab\');\nsections.forEach(function(s){s.classList.toggle(\'dsm-active\',s.getAttribute(\'data-single-merge-doc\')===String(idx));});\ntabs.forEach(function(t){t.classList.toggle(\'active\',t.getAttribute(\'data-dsm-target\')===String(idx));});\nwindow.scrollTo(0,0);\nwindow.dispatchEvent(new Event(\'resize\'));\ntry{document.dispatchEvent(new CustomEvent(\'dsm-module-shown\',{detail:{index:String(idx)}}));}catch(e){}\n}\ndocument.getElementById(\'dev-single-merge-nav\').addEventListener(\'click\',function(e){\nvar btn=e.target.closest(\'.dsm-tab\');\nif(btn)showDsmModule(btn.getAttribute(\'data-dsm-target\'));\n});\ndocument.addEventListener(\'click\',function(e){\nvar a=e.target.closest(\'a[href]\');\nif(!a)return;\nvar href=(a.getAttribute(\'href\')||\'\').trim();\nif(!href||href.charAt(0)===\'#\'||/^(https?:|mailto:|tel:|javascript:)/i.test(href))return;\nif(/\\.html?([?#].*)?$/i.test(href)){\ne.preventDefault();\nvar slug=href.split(/[?#]/)[0].replace(/^\\.\\//,\'\').replace(/\\.html?$/i,\'\').toLowerCase();\nif(slugMap[slug]){showDsmModule(slugMap[slug]);return;}\nvar linkText=(a.textContent||\'\').trim().toLowerCase();\nvar tabs=Array.from(document.querySelectorAll(\'#dev-single-merge-nav .dsm-tab\'));\nvar matched=tabs.find(function(t){return linkText&&t.textContent.toLowerCase().indexOf(linkText)>=0;});\nif(matched)showDsmModule(matched.getAttribute(\'data-dsm-target\'));\n}\n},true);';
+  var navLogic='var slugMap='+JSON.stringify(slugMap)+';\nfunction showDsmModule(idx){\nvar sections=document.querySelectorAll(\'[data-single-merge-doc]\');\nvar tabs=document.querySelectorAll(\'#dev-single-merge-nav .dsm-tab\');\nsections.forEach(function(s){s.classList.toggle(\'dsm-active\',s.getAttribute(\'data-single-merge-doc\')===String(idx));});\ntabs.forEach(function(t){t.classList.toggle(\'active\',t.getAttribute(\'data-dsm-target\')===String(idx));});\nwindow.scrollTo(0,0);\nif(window.innerWidth<=760){var _app=document.getElementById(\'dev-single-merge-app\');var _tgl=document.getElementById(\'dsm-toggle\');if(_app&&!_app.classList.contains(\'dsm-nav-hidden\')){_app.classList.add(\'dsm-nav-hidden\');if(_tgl){_tgl.textContent=\'\u2630 \';_tgl.setAttribute(\'aria-expanded\',\'false\');}}}\nwindow.dispatchEvent(new Event(\'resize\'));\ntry{document.dispatchEvent(new CustomEvent(\'dsm-module-shown\',{detail:{index:String(idx)}}));}catch(e){}\n}\ndocument.getElementById(\'dev-single-merge-nav\').addEventListener(\'click\',function(e){\nvar btn=e.target.closest(\'.dsm-tab\');\nif(btn)showDsmModule(btn.getAttribute(\'data-dsm-target\'));\n});\ndocument.addEventListener(\'click\',function(e){\nvar a=e.target.closest(\'a[href]\');\nif(!a)return;\nvar href=(a.getAttribute(\'href\')||\'\').trim();\nif(!href||href.charAt(0)===\'#\'||/^(https?:|mailto:|tel:|javascript:)/i.test(href))return;\nif(/\\.html?([?#].*)?$/i.test(href)){\ne.preventDefault();\nvar slug=href.split(/[?#]/)[0].replace(/^\\.\\//,\'\').replace(/\\.html?$/i,\'\').toLowerCase();\nif(slugMap[slug]){showDsmModule(slugMap[slug]);return;}\nvar linkText=(a.textContent||\'\').trim().toLowerCase();\nvar tabs=Array.from(document.querySelectorAll(\'#dev-single-merge-nav .dsm-tab\'));\nvar matched=tabs.find(function(t){return linkText&&t.textContent.toLowerCase().indexOf(linkText)>=0;});\nif(matched)showDsmModule(matched.getAttribute(\'data-dsm-target\'));\n}\n},true);\nvar dsmToggle=document.getElementById(\'dsm-toggle\');\nvar dsmApp=document.getElementById(\'dev-single-merge-app\');\nfunction toggleDsmNav(){\nvar hidden=dsmApp.classList.toggle(\'dsm-nav-hidden\');\nif(dsmToggle){dsmToggle.textContent=hidden?\'\u2630 Tools\':\'\u2715 Hide\';dsmToggle.setAttribute(\'aria-expanded\',String(!hidden));}\n}\nif(dsmToggle)dsmToggle.addEventListener(\'click\',toggleDsmNav);';
   var navScript='<script>\n'+navLogic+'\n<\/script>\n';
-  var html='<!-- saved from url=(0014)about:internet -->\n<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n'+headExtras.join('\n')+'\n<style>\n'+allStyles.join('\n')+'\n</style>\n</head>\n<body>\n<div id="dev-single-merge-app">\n<nav id="dev-single-merge-nav" aria-label="Merged Modules"><div class="dsm-brand">Tools<small>ஒரு tool-அ தேர்ந்தெடு</small></div>'+navButtons+'</nav>\n<main id="dev-single-merge-main">\n'+bodyParts.join('\n\n')+'\n</main>\n</div>\n'+extScripts+navScript+moduleScripts.join('\n')+'</body>\n</html>';
+  var html='<!-- saved from url=(0014)about:internet -->\n<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n'+headExtras.join('\n')+'\n<style>\n'+allStyles.join('\n')+'\n</style>\n</head>\n<body>\n<button type="button" id="dsm-toggle" aria-expanded="true" aria-controls="dev-single-merge-nav">\u2715 Hide</button>\n<div id="dev-single-merge-app">\n<nav id="dev-single-merge-nav" aria-label="Merged Modules"><div class="dsm-brand">Tools<small>ஒரு tool-அ தேர்ந்தெடு</small></div>'+navButtons+'</nav>\n<main id="dev-single-merge-main">\n'+bodyParts.join('\n\n')+'\n</main>\n</div>\n'+extScripts+navScript+moduleScripts.join('\n')+'</body>\n</html>';
   output.value=html;
-  var notes=['Sidebar-ல் ஒவ்வொரு tool-உம் தனியா மட்டும் திறக்கும், கீழே சேர்ந்து திறக்காது. Default tool முதலில் திறக்கும்.'];
+  var notes=['Sidebar-ல் ஒவ்வொரு tool-உம் தனியா மட்டும் திறக்கும். மேலே இருக்குற Hide / Tools button-அல் Sidebar-அ Hide / Open பண்ணலாம்.'];
   if(warnings.length)notes=notes.concat(warnings);
   status.textContent='Generated '+html.length.toLocaleString()+' characters from '+docs.length+' module(s). '+notes.join('. ')+'.';
   return html;
@@ -7494,7 +7536,8 @@ body.dark-mode #single-html-merge-dialog{background:#111827;color:#e5e7eb}body.d
  document.getElementById('single-html-merge-add').addEventListener('click',function(){addInput();});
  document.getElementById('single-html-merge-run').addEventListener('click',function(){try{merge();}catch(e){status.textContent='Merge failed: '+e.message;}});
  document.getElementById('single-html-merge-copy').addEventListener('click',function(){if(!output.value){status.textContent='Generate the merged HTML first.';return;}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(output.value).then(function(){status.textContent='Merged HTML copied. Notepad-ல் paste பண்ணி Save பண்ணினால் Windows Block வராது.';}).catch(function(){output.select();document.execCommand('copy');status.textContent='Merged HTML copied. Notepad-ல் paste பண்ணி Save பண்ணினால் Windows Block வராது.';});else{output.select();document.execCommand('copy');status.textContent='Merged HTML copied. Notepad-ல் paste பண்ணி Save பண்ணினால் Windows Block வராது.';}});
- document.getElementById('single-html-merge-download').addEventListener('click',async function(){if(!output.value){status.textContent='Generate the merged HTML first.';return;}var content=output.value;if(window.showSaveFilePicker){try{var handle=await window.showSaveFilePicker({suggestedName:'merged-single.html',types:[{description:'HTML File',accept:{'text/html':['.html']}}]});var writable=await handle.createWritable();await writable.write(content);await writable.close();status.textContent='Saved! நேரடியா save ஆச்சு, Zone mark இல்லை, Windows Block வராது.';return;}catch(e){if(e&&e.name==='AbortError'){status.textContent='Save cancel பண்ணிட்டீங்க.';return;}}}var blob=new Blob([content],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='merged-single.html';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1200);status.textContent='merged-single.html downloaded. Browser download-ல Zone mark விழும், Windows block பண்ணினால்: file மேல Right-click > Properties > Unblock tick > Apply. Block வேண்டாம்னா மறுபடியும் Download > Save As dialog-ல save பண்ணுங்க, இல்லைனா Copy Output > Notepad-ல் Save பண்ணுங்க.';});
+ document.getElementById('single-html-merge-download').addEventListener('click',async function(){if(!output.value){status.textContent='Generate the merged HTML first.';return;}var content=output.value;if(window.showSaveFilePicker){try{var handle=await window.showSaveFilePicker({suggestedName:'merged-single.html',types:[{description:'HTML File',accept:{'text/html':['.html']}}]});var writable=await handle.createWritable();await writable.write(content);await writable.close();status.textContent='Saved! நேரடியா save ஆச்சு, Zone mark இல்லை, Windows Block வராது.';return;}catch(e){if(e&&e.name==='AbortError'){status.textContent='Save cancel பண்ணிட்டீங்க.';return;}status.textContent='Save As dialog open aagala ('+(e&&e.name?e.name:'blocked')+'). New Tab button / Copy method use pannunga.';}}else{status.textContent='Ungal browser-la Save As option illa. New Tab button / Copy method use pannunga.';}var blob=new Blob([content],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='merged-single.html';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1200);});
+ document.getElementById('single-html-merge-save-newtab').addEventListener('click',function(){if(!output.value){status.textContent='Generate the merged HTML first.';return;}var blob=new Blob([output.value],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),w=window.open(url,'_blank');if(!w){status.textContent='Popup block aachu. Browser-ல popup allow pannitu marupadiyum try pannunga.';return;}status.textContent='New Tab-ல் merged HTML open aachu. Anga Ctrl+S > Save As > merged-single.html nu save pannunga. Athukku Zone mark vizhathu.';});
  document.getElementById('single-html-merge-preview').addEventListener('click',function(){
   if(!output.value){status.textContent='Generate the merged HTML first.';return;}
   if(typeof window.switchMode==='function' && !document.body.classList.contains('single-mode-active'))window.switchMode('single');
