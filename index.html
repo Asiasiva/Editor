@@ -7248,6 +7248,24 @@ body.dark-mode .single-mode-side-btn.active{background:#2563eb;color:#ffffff}
 @media(max-width:767px){.single-mode-sidebar{top:0;left:0;bottom:0;border-radius:0 0.8rem 0.8rem 0;padding-top:56px}}
 body.dark-mode #single-html-merge-dialog{background:#111827;color:#e5e7eb}body.dark-mode #single-html-merge-list{background:#111827}body.dark-mode .single-html-merge-item{border-color:#374151}body.dark-mode .single-html-merge-item label{background:#1f2937;color:#e5e7eb}body.dark-mode .single-html-merge-item textarea,body.dark-mode #single-html-merge-output{background:#0f172a;color:#e5e7eb;border-color:#374151}
 @media(max-width:700px){#single-html-merge-list{grid-template-columns:1fr}#single-html-merge-dialog{height:96vh}#single-html-merge-output-wrap{min-height:160px}}
+/* Merge dialog mattum - mobile fix */
+@media(max-width:768px){
+  #single-html-merge-dialog{width:100vw !important;height:100dvh !important;max-height:100dvh !important;border-radius:0 !important;overflow-y:auto !important;overflow-x:hidden !important;}
+  #single-html-merge-dialog header{flex:none !important;}
+  #single-html-merge-toolbar{order:1 !important;flex:none !important;}
+  #single-html-merge-toolbar button{flex:1 1 45% !important;padding:11px 8px !important;font-size:12px !important;}
+  /* PASTE BOX-A MELA KONDU VA - options-ku munnadi theriyanum */
+  #single-html-merge-list{order:2 !important;flex:none !important;overflow:visible !important;display:flex !important;flex-direction:column !important;gap:14px !important;padding:12px !important;min-height:0 !important;background:#111827 !important;}
+  #single-html-merge-list::before{content:"Paste HTML Inge - Add HTML click panna pudhu box inge varum";display:block;font-size:13px;font-weight:800;color:#fbbf24;background:#1e293b;border:1px solid #374151;border-radius:8px;padding:10px 12px;}
+  #single-html-merge-options{order:3 !important;flex:none !important;grid-template-columns:1fr !important;gap:6px !important;padding:8px !important;}
+  #single-html-merge-options .dsm-opt-group{padding:8px 10px !important;}
+  #single-html-merge-output-wrap{order:4 !important;flex:none !important;min-height:220px !important;}
+  .single-html-merge-item{width:100% !important;flex:none !important;min-height:0 !important;border:2px solid #3b82f6 !important;box-shadow:0 4px 16px rgba(59,130,246,.25) !important;}
+  .single-html-merge-item textarea{display:block !important;flex:none !important;min-height:200px !important;border-top:2px solid #3b82f6 !important;background:#ffffff !important;color:#111827 !important;font-size:13px !important;}
+  .single-html-merge-item textarea:focus{outline:3px solid #22c55e !important;}
+}
+
+
 </style>
 <div id="single-html-merge-modal" aria-hidden="true">
  <section id="single-html-merge-dialog" role="dialog" aria-modal="true" aria-label="Multi Single HTML Merge">
@@ -7623,14 +7641,14 @@ body.dark-mode #single-html-merge-dialog{background:#111827;color:#e5e7eb}body.d
    return tab;
   }).join('');
   var searchHtml = optSearch ? '<input type="text" id="dsm-search" placeholder="Tool thedu...">' : '';
-  var recentHtml = optRecent ? '<div id="dsm-recent"><span>Recent:</span> <span id="dsm-recent-list">Empty</span></div>' : '';
+  var recentHtml = optRecent ? '<div id="dsm-recent"><span>Recent:</span> <span id="dsm-recent-list">onnum illa</span></div>' : '';
   var navInner = searchHtml + recentHtml + navButtons;
   var homeCards = docs.map(function(d){
    var esc=d.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-   return '<button type="button" class="dsm-home-card" data-dsm-home-target="'+d.index+'"><b>'+esc+'</b><span></span></button>';
+   return '<button type="button" class="dsm-home-card" data-dsm-home-target="'+d.index+'"><b>'+esc+'</b><span>Thirakka click pannunga</span></button>';
   }).join('');
-  var homeHtml = '<div id="dsm-home" style="display:'+(optStart==='home'?'block':'none')+'"><h1></h1><p></p><div class="dsm-home-grid">'+homeCards+'</div></div>';
-  var emptyHtml = '<div id="dsm-empty" style="display:'+(optStart==='closed'?'block':'none')+'"><h2></h2><p></p></div>';
+  var homeHtml = '<div id="dsm-home" style="display:'+(optStart==='home'?'block':'none')+'"><h1>Ellam tools-um inga</h1><p>Oru card-a click panna antha tool open aagum.</p><div class="dsm-home-grid">'+homeCards+'</div></div>';
+  var emptyHtml = '<div id="dsm-empty" style="display:'+(optStart==='closed'?'block':'none')+'"><h2>Oru tool-a thernthedu</h2><p>Pakathula irukura 3 koodu button-a click panni list-a paakalam.</p></div>';
   var actionsHtml = '';
   if(optFullscreen||optPrint||optDownload||optCopy||optReload){
    actionsHtml='<div id="dsm-actions">';
@@ -7691,11 +7709,11 @@ body.dark-mode #single-html-merge-dialog{background:#111827;color:#e5e7eb}body.d
   var editor=document.getElementById('html-code');if(editor)editor.focus();
  });
  document.getElementById('single-html-merge-close').addEventListener('click',close);
- document.getElementById('single-html-merge-add').addEventListener('click',function(){addInput();});
+ document.getElementById('single-html-merge-add').addEventListener('click',function(){addInput();var _cards=list.querySelectorAll('.single-html-merge-item');var _last=_cards[_cards.length-1];if(_last){_last.scrollIntoView({behavior:'smooth',block:'start'});var _ta=_last.querySelector('textarea');if(_ta){setTimeout(function(){_ta.focus();},250);}}});
  document.getElementById('single-html-merge-run').addEventListener('click',function(){try{merge();}catch(e){status.textContent='Merge failed: '+e.message;}});
- document.getElementById('single-html-merge-copy').addEventListener('click',function(){if(!output.value){status.textContent='Generate the merged HTML first.';return;}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(output.value).then(function(){status.textContent='Merged HTML copied. Notepad-ல் paste பண்ணி Save பண்ணினால் Windows Block வராது.';}).catch(function(){output.select();document.execCommand('copy');status.textContent='Merged HTML copied. Notepad-ல் paste பண்ணி Save பண்ணினால் Windows Block வராது.';});else{output.select();document.execCommand('copy');status.textContent='Merged HTML copied. Notepad-ல் paste பண்ணி Save பண்ணினால் Windows Block வராது.';}});
- document.getElementById('single-html-merge-download').addEventListener('click',async function(){if(!output.value){status.textContent='Generate the merged HTML first.';return;}var content=output.value;if(window.showSaveFilePicker){try{var handle=await window.showSaveFilePicker({suggestedName:'merged-single.html',types:[{description:'HTML File',accept:{'text/html':['.html']}}]});var writable=await handle.createWritable();await writable.write(content);await writable.close();status.textContent='Saved! நேரடியா save ஆச்சு, Zone mark இல்லை, Windows Block வராது.';return;}catch(e){if(e&&e.name==='AbortError'){status.textContent='Save cancel பண்ணிட்டீங்க.';return;}status.textContent='Save As dialog open aagala ('+(e&&e.name?e.name:'blocked')+'). New Tab button / Copy method use pannunga.';}}else{status.textContent='Ungal browser-la Save As option illa. New Tab button / Copy method use pannunga.';}var blob=new Blob([content],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='merged-single.html';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1200);});
- document.getElementById('single-html-merge-save-newtab').addEventListener('click',function(){if(!output.value){status.textContent='Generate the merged HTML first.';return;}var blob=new Blob([output.value],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),w=window.open(url,'_blank');if(!w){status.textContent='Popup block aachu. Browser-ல popup allow pannitu marupadiyum try pannunga.';return;}status.textContent='New Tab-ல் merged HTML open aachu. Anga Ctrl+S > Save As > merged-single.html nu save pannunga. Athukku Zone mark vizhathu.';});
+ document.getElementById('single-html-merge-copy').addEventListener('click',function(){if(!output.value){status.textContent='Generate the merged HTML first.';return;}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(output.value).then(function(){status.textContent='Merged HTML copied. Notepad-ல் paste பண்ணி Save பண்ணினால் Windows Block வராது.';}).catch(function(){output.select();document.execCommand('copy');status.textContent='';});else{output.select();document.execCommand('copy');status.textContent='';}});
+ document.getElementById('single-html-merge-download').addEventListener('click',async function(){if(!output.value){status.textContent='Generate the merged HTML first.';return;}var content=output.value;if(window.showSaveFilePicker){try{var handle=await window.showSaveFilePicker({suggestedName:'merged-single.html',types:[{description:'HTML File',accept:{'text/html':['.html']}}]});var writable=await handle.createWritable();await writable.write(content);await writable.close();status.textContent='';return;}catch(e){if(e&&e.name==='AbortError'){status.textContent='';return;}status.textContent='Save As dialog open aagala ('+(e&&e.name?e.name:'blocked')+'). New Tab button / Copy method use pannunga.';}}else{status.textContent='Ungal browser-la Save As option illa. New Tab button / Copy method use pannunga.';}var blob=new Blob([content],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='merged-single.html';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1200);});
+ document.getElementById('single-html-merge-save-newtab').addEventListener('click',function(){if(!output.value){status.textContent='Generate the merged HTML first.';return;}var blob=new Blob([output.value],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),w=window.open(url,'_blank');if(!w){status.textContent='';return;}status.textContent='';});
  document.getElementById('single-html-merge-preview').addEventListener('click',function(){
   if(!output.value){status.textContent='Generate the merged HTML first.';return;}
   if(typeof window.switchMode==='function' && !document.body.classList.contains('single-mode-active'))window.switchMode('single');
